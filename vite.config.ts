@@ -37,7 +37,8 @@ function getElementPlusStylePaths() {
 }
 
 export default defineConfig({
-    base: '/admin/',
+    // 部署到 EdgeOne 站点根目录，资源请求 /assets/*，故 base 使用根路径
+    base: '/',
     server: {
         host: '0.0.0.0',
         hmr: true,
