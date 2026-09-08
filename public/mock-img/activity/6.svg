@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#51CF66"/>
+      <stop offset="1" stop-color="#2F9E44"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <circle cx="352" cy="42" r="78" fill="#ffffff" opacity="0.10"/>
+  <circle cx="36" cy="268" r="58" fill="#ffffff" opacity="0.10"/>
+  <circle cx="310" cy="252" r="30" fill="#ffffff" opacity="0.08"/>
+  <g transform="translate(160,52)"><circle cx="40" cy="28" r="19" fill="#ffffff"/><circle cx="25" cy="38" r="12" fill="#ffffff"/><circle cx="55" cy="38" r="12" fill="#ffffff"/><rect x="35" y="46" width="10" height="24" rx="3" fill="#ffffff" opacity="0.92"/><rect x="16" y="70" width="48" height="5" rx="2.5" fill="#ffffff" opacity="0.7"/></g>
+  <text x="200" y="204" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="27" font-weight="600" fill="#ffffff">社区植树节活动</text>
+  <text x="200" y="240" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="15" fill="#ffffff" opacity="0.78">播种绿色 · 共建家园</text>
+</svg>

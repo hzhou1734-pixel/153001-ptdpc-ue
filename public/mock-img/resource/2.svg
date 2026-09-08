@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4DABF7"/>
+      <stop offset="1" stop-color="#339AF0"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <circle cx="352" cy="42" r="78" fill="#ffffff" opacity="0.10"/>
+  <circle cx="36" cy="268" r="58" fill="#ffffff" opacity="0.10"/>
+  <circle cx="310" cy="252" r="30" fill="#ffffff" opacity="0.08"/>
+  <g transform="translate(160,52)"><path d="M40 20 C33 14 20 12 10 15 L10 58 C20 55 33 57 40 63 C47 57 60 55 70 58 L70 15 C60 12 47 14 40 20 Z" fill="#ffffff"/><line x1="40" y1="22" x2="40" y2="61" stroke="#000000" stroke-width="3" opacity="0.12"/></g>
+  <text x="200" y="204" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="27" font-weight="600" fill="#ffffff">儿童绘本</text>
+  <text x="200" y="240" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="15" fill="#ffffff" opacity="0.78">图书文具 · 成套转出</text>
+</svg>

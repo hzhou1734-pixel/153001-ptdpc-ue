@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FF6B9D"/>
+      <stop offset="1" stop-color="#F06595"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <circle cx="352" cy="42" r="78" fill="#ffffff" opacity="0.10"/>
+  <circle cx="36" cy="268" r="58" fill="#ffffff" opacity="0.10"/>
+  <circle cx="310" cy="252" r="30" fill="#ffffff" opacity="0.08"/>
+  <g transform="translate(160,52)"><line x1="32" y1="52" x2="57" y2="10" stroke="#ffffff" stroke-width="7" stroke-linecap="round"/><line x1="48" y1="52" x2="23" y2="10" stroke="#ffffff" stroke-width="7" stroke-linecap="round"/><circle cx="26" cy="61" r="9" fill="none" stroke="#ffffff" stroke-width="6"/><circle cx="54" cy="61" r="9" fill="none" stroke="#ffffff" stroke-width="6"/><circle cx="40" cy="41" r="4.5" fill="#ffffff"/></g>
+  <text x="200" y="204" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="27" font-weight="600" fill="#ffffff">亲子手工DIY</text>
+  <text x="200" y="240" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="15" fill="#ffffff" opacity="0.78">亲子时光 · 创意无限</text>
+</svg>

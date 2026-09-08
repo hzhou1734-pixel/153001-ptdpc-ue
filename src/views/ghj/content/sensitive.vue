@@ -105,6 +105,7 @@ import {
 } from '@/api/ghj/content'
 import Popup from '@/components/popup/index.vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import feedback from '@/utils/feedback'
 
 import { usePaging } from '@/hooks/usePaging'
 
@@ -150,10 +151,16 @@ const handleEdit = (row: any) => {
 
 const handleSubmit = async () => {
     await formRef.value?.validate()
-    if (mode.value === 'edit') {
-        await sensitiveEdit(formData)
-    } else {
-        await sensitiveAdd(formData)
+    try {
+        if (mode.value === 'edit') {
+            await sensitiveEdit(formData)
+        } else {
+            await sensitiveAdd(formData)
+        }
+    } catch (error) {
+        // 重名等业务校验失败，弹窗保持打开并提示错误
+        feedback.msgError((error as Error).message || '操作失败')
+        return
     }
     popupRef.value?.close()
     ElMessage.success('操作成功')

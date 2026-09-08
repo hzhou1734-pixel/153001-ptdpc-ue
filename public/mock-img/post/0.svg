@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5B8DEF"/>
+      <stop offset="1" stop-color="#3B6FD4"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <circle cx="352" cy="42" r="78" fill="#ffffff" opacity="0.10"/>
+  <circle cx="36" cy="268" r="58" fill="#ffffff" opacity="0.10"/>
+  <circle cx="310" cy="252" r="30" fill="#ffffff" opacity="0.08"/>
+  <g transform="translate(160,52)"><rect x="12" y="12" width="56" height="56" rx="12" fill="none" stroke="#ffffff" stroke-width="6"/><text x="40" y="56" text-anchor="middle" font-family="Arial,sans-serif" font-size="40" font-weight="bold" fill="#ffffff">P</text></g>
+  <text x="200" y="204" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="27" font-weight="600" fill="#ffffff">小区停车位改造建议</text>
+  <text x="200" y="240" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="15" fill="#ffffff" opacity="0.78">业主议事 · 治理共建</text>
+</svg>

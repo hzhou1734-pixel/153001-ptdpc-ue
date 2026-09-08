@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#B08968"/>
+      <stop offset="1" stop-color="#8D6E4F"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <circle cx="352" cy="42" r="78" fill="#ffffff" opacity="0.10"/>
+  <circle cx="36" cy="268" r="58" fill="#ffffff" opacity="0.10"/>
+  <circle cx="310" cy="252" r="30" fill="#ffffff" opacity="0.08"/>
+  <g transform="translate(160,52)"><path d="M40 8 L72 36 L64 36 L64 66 L16 66 L16 36 L8 36 Z" fill="#ffffff"/><rect x="33" y="44" width="14" height="22" rx="7" fill="#000000" opacity="0.16"/></g>
+  <text x="200" y="204" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="27" font-weight="600" fill="#ffffff">宠物寄养互助</text>
+  <text x="200" y="240" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="15" fill="#ffffff" opacity="0.78">宠物互助 · 假期托管</text>
+</svg>

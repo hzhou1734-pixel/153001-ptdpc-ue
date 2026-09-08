@@ -37,6 +37,13 @@ const ago = (days: number, hours = 0) =>
 
 export const GHJ_STATUS = { NORMAL: 1, DISABLE: 0 }
 
+// 静态示例图片（public/mock-img 下按业务场景预置的 SVG），按索引确定性取值
+const POST_IMGS = makeList(7, (i) => `${import.meta.env.BASE_URL}mock-img/post/${i}.svg`)
+const RESOURCE_IMGS = makeList(7, (i) => `${import.meta.env.BASE_URL}mock-img/resource/${i}.svg`)
+const ACTIVITY_IMGS = makeList(7, (i) => `${import.meta.env.BASE_URL}mock-img/activity/${i}.svg`)
+const WONDERFUL_IMGS = makeList(5, (i) => `${import.meta.env.BASE_URL}mock-img/wonderful/${i}.svg`)
+const AVATAR_IMGS = makeList(8, (i) => `${import.meta.env.BASE_URL}mock-img/avatar/${i}.svg`)
+
 /** 生成列表数据 */
 function makeList<T>(count: number, factory: (i: number) => T): T[] {
     return Array.from({ length: count }, (_, i) => factory(i))
@@ -95,7 +102,7 @@ export const userDb = makeList(260, (i) => {
     const status = rand() > 0.1 ? 1 : 0
     return {
         id: 30001 + i,
-        avatar: '',
+        avatar: AVATAR_IMGS[i % AVATAR_IMGS.length],
         nickname,
         mobile: `1${pick(['3', '5', '7', '8', '9'])}${String(randInt(100000000, 999999999)).slice(0, 9)}`,
         status,
@@ -163,7 +170,7 @@ export const staffDb = makeList(96, (i) => {
     const c = pick(communityDb)
     return {
         id: 80001 + i,
-        avatar: '',
+        avatar: AVATAR_IMGS[(i + 3) % AVATAR_IMGS.length],
         nickname: `${pick(surnames)}${pick(given1)}`,
         mobile: `1${pick(['3', '5', '7', '8', '9'])}${String(randInt(100000000, 999999999)).slice(0, 9)}`,
         property_id: c.property_id,
@@ -180,7 +187,7 @@ export const postDb = makeList(72, (i) => {
     const c = pick(communityDb)
     return {
         id: 90001 + i,
-        image: '',
+        image: POST_IMGS[i % POST_IMGS.length],
         title: pick([
             '小区停车位改造建议',
             '周末邻里义诊活动通知',
@@ -191,7 +198,7 @@ export const postDb = makeList(72, (i) => {
             '宠物便便箱位置建议'
         ]),
         property_name: c.property_name,
-        avatar: '',
+        avatar: AVATAR_IMGS[(i + 1) % AVATAR_IMGS.length],
         nickname: u.nickname,
         mobile: u.mobile,
         audit_status: pick(['待审核', '已通过', '已驳回']),
@@ -203,11 +210,12 @@ export const postDb = makeList(72, (i) => {
     }
 })
 
-// 帖子评论
+// 帖子评论（两级结构：父评论 + replies 子回复）
 export const postCommentDb = (postId: number) =>
-    makeList(randInt(2, 9), (i) => ({
+    makeList(randInt(2, 6), (i) => ({
         id: 100001 + i,
         post_id: postId,
+        avatar: AVATAR_IMGS[(i + 4) % AVATAR_IMGS.length],
         nickname: `${pick(surnames)}${pick(given1)}`,
         content: pick([
             '说得太对了，支持！',
@@ -216,7 +224,23 @@ export const postCommentDb = (postId: number) =>
             '感谢分享，已收藏',
             '希望能尽快改进'
         ]),
-        create_time: ago(randInt(0, 30))
+        create_time: ago(randInt(0, 30)),
+        replies: makeList(randInt(0, 3), (j) => ({
+            id: 200001 + i * 100 + j,
+            post_id: postId,
+            parent_id: 100001 + i,
+            avatar: AVATAR_IMGS[(i + j + 6) % AVATAR_IMGS.length],
+            nickname: `${pick(surnames)}${pick(given1)}`,
+            reply_nickname: '',
+            content: pick([
+                '同意楼上的说法',
+                '已经反馈给物业了',
+                '明天一起去看看？',
+                '同求进展，蹲一个后续',
+                '好的，谢谢告知'
+            ]),
+            create_time: ago(randInt(0, 15))
+        }))
     }))
 
 // ---------------------------------------------------------------- 内容：资源大厅
@@ -225,7 +249,7 @@ export const resourceDb = makeList(58, (i) => {
     const c = pick(communityDb)
     return {
         id: 110001 + i,
-        image: '',
+        image: RESOURCE_IMGS[i % RESOURCE_IMGS.length],
         title: pick([
             '闲置婴儿车一台',
             '搬家纸箱免费自取',
@@ -236,7 +260,7 @@ export const resourceDb = makeList(58, (i) => {
             '宠物寄养互助'
         ]),
         property_name: c.property_name,
-        avatar: '',
+        avatar: AVATAR_IMGS[(i + 2) % AVATAR_IMGS.length],
         nickname: u.nickname,
         mobile: u.mobile,
         audit_status: pick(['待审核', '已通过', '已驳回']),
@@ -249,7 +273,13 @@ export const resourceDb = makeList(58, (i) => {
 // ---------------------------------------------------------------- 内容：敏感词
 export const sensitiveDb = makeList(36, (i) => ({
     id: 120001 + i,
-    name: pick(['赌博', '贷款', '加微信', '刷单', '低价出售', '私彩', '代开发票', '兼职日结', '博彩', '违法代办']),
+    name: [
+        '赌博', '博彩', '私彩', '彩票代购', '贷款', '借款', '套现', '信用卡代办',
+        '加微信', '加V', '扫码进群', '刷单', '兼职日结', '高薪兼职', '点赞返现',
+        '低价出售', '低价代购', '免税代购', '代开发票', '代办证件', '违法代办',
+        '代考', '刷信誉', '刷好评', '外挂', '代练', '账号出售', '回收游戏币',
+        '裸聊', '约炮', '一夜情', '代孕', '办证刻章', '麻醉药品', '枪支', '管制刀具'
+    ][i],
     status: rand() > 0.2 ? 1 : 0,
     create_time: ago(randInt(1, 200))
 }))
@@ -260,7 +290,7 @@ export const activityDb = makeList(28, (i) => {
     const limit = randInt(20, 300)
     return {
         id: 130001 + i,
-        image: '',
+        image: ACTIVITY_IMGS[i % ACTIVITY_IMGS.length],
         title: pick([
             '社区中秋晚会报名',
             '老年人智能手机课堂',
@@ -282,7 +312,7 @@ export const activityRecordDb = (activityId: number) =>
     makeList(randInt(3, 12), (i) => ({
         id: 140001 + i,
         activity_id: activityId,
-        avatar: '',
+        avatar: AVATAR_IMGS[(i + 5) % AVATAR_IMGS.length],
         nickname: `${pick(surnames)}${pick(given1)}`,
         mobile: `1${pick(['3', '5', '7', '8', '9'])}${String(randInt(100000000, 999999999)).slice(0, 9)}`,
         join_time: ago(randInt(0, 60))
@@ -322,7 +352,7 @@ export const wonderfulDb = makeList(34, (i) => {
     const c = pick(communityDb)
     return {
         id: 170001 + i,
-        image: '',
+        image: WONDERFUL_IMGS[i % WONDERFUL_IMGS.length],
         title: pick([
             '社区达人：退休教师的第二课堂',
             '邻里互助：一场及时雨',
@@ -363,8 +393,8 @@ adminDb.forEach((item: any) => {
 export const settingDb = {
     basic: {
         system_name: '顾好家社区服务平台',
-        logo: '',
-        default_avatar: ''
+        logo: import.meta.env.BASE_URL + 'guhaojia-icon.png',
+        default_avatar: AVATAR_IMGS[0]
     },
     sms: {
         ali_key: 'LTAI5tQxKxxxxxxxxxxx',

@@ -2,7 +2,7 @@
 <template>
     <div>
         <el-card shadow="never" class="!border-none">
-            <el-form ref="formRef" :rules="rules" :model="formData" label-width="140px">
+            <el-form ref="formRef" :rules="rules" :model="formData" label-width="190px">
                 <div class="text-xl font-medium mb-[20px]">短信设置</div>
                 <el-form-item label="阿里云AccessKeyId" prop="ali_key">
                     <div class="w-80">

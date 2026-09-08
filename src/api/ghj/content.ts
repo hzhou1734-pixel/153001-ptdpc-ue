@@ -60,6 +60,9 @@ export function getSensitiveList(params: Record<string, any>) {
 }
 
 export function sensitiveAdd(params: Record<string, any>) {
+    if (sensitiveDb.some((i) => i.name === params.name)) {
+        throw new Error('敏感词名称已存在')
+    }
     sensitiveDb.unshift({
         id: nextId(sensitiveDb),
         create_time: new Date().toLocaleString('zh-CN', { hour12: false }),
@@ -69,6 +72,9 @@ export function sensitiveAdd(params: Record<string, any>) {
 }
 
 export function sensitiveEdit(params: Record<string, any>) {
+    if (sensitiveDb.some((i) => i.name === params.name && String(i.id) !== String(params.id))) {
+        throw new Error('敏感词名称已存在')
+    }
     const index = sensitiveDb.findIndex((i) => String(i.id) === String(params.id))
     if (index > -1) sensitiveDb[index] = { ...sensitiveDb[index], ...params }
     return delay({}, 200)

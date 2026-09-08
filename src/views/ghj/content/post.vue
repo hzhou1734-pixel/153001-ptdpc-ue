@@ -140,14 +140,6 @@
                     <span>{{ detail.comment_count ?? '-' }}</span>
                 </div>
             </div>
-            <div class="mt-4">
-                <div class="detail__label mb-2.5">评论列表</div>
-                <el-table size="small" :data="detail.comments || []">
-                    <el-table-column label="评论人" prop="nickname" min-width="120" />
-                    <el-table-column label="评论内容" prop="content" min-width="220" show-overflow-tooltip />
-                    <el-table-column label="评论时间" prop="create_time" min-width="170" />
-                </el-table>
-            </div>
         </popup>
 
         <!-- 评论记录 -->
@@ -158,11 +150,40 @@
             confirm-button-text="关闭"
             :cancel-button-text="false"
         >
-            <el-table size="large" :data="comments">
-                <el-table-column label="评论人" prop="nickname" min-width="120" />
-                <el-table-column label="评论内容" prop="content" min-width="260" show-overflow-tooltip />
-                <el-table-column label="评论时间" prop="create_time" min-width="170" />
-            </el-table>
+            <el-empty v-if="!comments.length" description="暂无评论" />
+            <div v-else class="comment-list">
+                <div v-for="item in comments" :key="item.id" class="comment-item">
+                    <div class="comment-main">
+                        <el-avatar :src="item.avatar" :size="36" />
+                        <div class="comment-body">
+                            <div class="comment-head">
+                                <span class="comment-nickname">{{ item.nickname }}</span>
+                                <span class="comment-time">{{ item.create_time }}</span>
+                            </div>
+                            <div class="comment-content">{{ item.content }}</div>
+                        </div>
+                    </div>
+                    <!-- 二级评论（子回复） -->
+                    <div v-if="item.replies && item.replies.length" class="comment-replies">
+                        <div v-for="reply in item.replies" :key="reply.id" class="reply-item">
+                            <el-avatar :src="reply.avatar" :size="28" />
+                            <div class="reply-body">
+                                <div class="comment-head">
+                                    <span class="comment-nickname">
+                                        {{ reply.nickname
+                                        }}<template v-if="reply.reply_nickname">
+                                            <span class="reply-arrow"> → </span
+                                            >{{ reply.reply_nickname }}</template
+                                        >
+                                    </span>
+                                    <span class="comment-time">{{ reply.create_time }}</span>
+                                </div>
+                                <div class="comment-content">{{ reply.content }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </popup>
     </div>
 </template>
@@ -253,5 +274,69 @@ getLists()
     &__label {
         color: #909399;
     }
+}
+
+// 评论记录：父评论 + 缩进子回复
+.comment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.comment-item {
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f0f0f0;
+    &:last-child {
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+}
+.comment-main,
+.reply-item {
+    display: flex;
+    align-items: flex-start;
+}
+.comment-body,
+.reply-body {
+    flex: 1;
+    min-width: 0;
+    margin-left: 10px;
+}
+.comment-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.comment-nickname {
+    font-size: 13px;
+    font-weight: 600;
+    color: #303133;
+    word-break: break-all;
+}
+.reply-arrow {
+    font-weight: 400;
+    color: #909399;
+}
+.comment-time {
+    flex-shrink: 0;
+    font-size: 12px;
+    color: #909399;
+}
+.comment-content {
+    margin-top: 2px;
+    font-size: 14px;
+    line-height: 22px;
+    color: #606266;
+    word-break: break-all;
+}
+.comment-replies {
+    margin-top: 10px;
+    margin-left: 46px; // 头像36 + 间距10，与父评论正文对齐
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #f7f8fa;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 </style>

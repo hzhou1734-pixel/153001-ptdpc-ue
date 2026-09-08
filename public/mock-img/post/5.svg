@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9775FA"/>
+      <stop offset="1" stop-color="#7C4DE0"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <circle cx="352" cy="42" r="78" fill="#ffffff" opacity="0.10"/>
+  <circle cx="36" cy="268" r="58" fill="#ffffff" opacity="0.10"/>
+  <circle cx="310" cy="252" r="30" fill="#ffffff" opacity="0.08"/>
+  <g transform="translate(160,52)"><rect x="24" y="6" width="32" height="68" rx="9" fill="#ffffff"/><rect x="29" y="17" width="22" height="42" rx="3" fill="#000000" opacity="0.16"/><circle cx="40" cy="66" r="3.2" fill="#000000" opacity="0.22"/><line x1="35" y1="11.5" x2="45" y2="11.5" stroke="#000000" stroke-width="2" stroke-linecap="round" opacity="0.22"/></g>
+  <text x="200" y="204" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="27" font-weight="600" fill="#ffffff">老人手机课堂报名啦</text>
+  <text x="200" y="240" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="15" fill="#ffffff" opacity="0.78">公益课堂 · 免费学习</text>
+</svg>
