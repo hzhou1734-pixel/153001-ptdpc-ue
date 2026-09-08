@@ -18,6 +18,7 @@ export function getPropertyDetail(params: { id: any }) {
 }
 
 export function propertyAdd(params: Record<string, any>) {
+    // as any：propertyDb 元素类型为全字段推断类型，新增时表单仅回传部分字段，其余由默认值兜底
     propertyDb.unshift({
         id: nextId(propertyDb),
         community_count: 0,
@@ -26,7 +27,7 @@ export function propertyAdd(params: Record<string, any>) {
         total_amount: 0,
         create_time: new Date().toLocaleString('zh-CN', { hour12: false }),
         ...params
-    })
+    } as any)
     return delay({}, 200)
 }
 

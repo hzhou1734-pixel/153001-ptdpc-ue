@@ -102,11 +102,13 @@
                         <el-form-item label="账号有效期">
                             <div>
                                 <el-date-picker
-                                    v-model="formData.expire_time"
-                                    type="date"
-                                    placeholder="请选择账号有效期（选填）"
+                                    v-model="expireRange"
+                                    type="daterange"
+                                    range-separator="至"
+                                    start-placeholder="开始日期"
+                                    end-placeholder="结束日期"
                                     value-format="YYYY-MM-DD"
-                                    clearable
+                                    :clearable="true"
                                 />
                                 <div class="form-tips">超期限后自动关停线上运营权限</div>
                             </div>
@@ -201,8 +203,13 @@ const formData = reactive<any>({
     account: '',
     password: '',
     status: 1,
-    expire_time: ''
+    expire_start: '',
+    expire_end: ''
 })
+
+// 账号有效期范围选择器的中间态，提交时拆回 expire_start / expire_end
+// （any：el-date-picker 的 modelValue 联合类型不含 null，直接标 [string, string] | null 会报 TS2322）
+const expireRange = ref<any>(null)
 
 // 编辑时密码留空表示不修改
 const formRules = computed(() => ({
@@ -237,14 +244,22 @@ const handleEdit = (row: Record<string, any>) => {
         mobile: row.mobile,
         account: row.account ?? '',
         status: Number(row.status),
-        expire_time: row.expire_time ?? ''
+        expire_start: row.expire_start ?? '',
+        expire_end: row.expire_end ?? ''
     })
+    expireRange.value =
+        formData.expire_start && formData.expire_end
+            ? [formData.expire_start, formData.expire_end]
+            : null
     formData.password = ''
     popupRef.value?.open()
 }
 
 const handleSubmit = async () => {
     await formRef.value?.validate()
+    // 范围选择器值拆回起止字段；清空范围则两个有效期字段一并置空
+    formData.expire_start = expireRange.value?.[0] ?? ''
+    formData.expire_end = expireRange.value?.[1] ?? ''
     if (mode.value === 'edit') {
         await propertyEdit(formData)
     } else {
@@ -259,7 +274,9 @@ const handleClose = () => {
     formRef.value?.resetFields()
     formData.id = ''
     formData.password = ''
-    formData.expire_time = ''
+    formData.expire_start = ''
+    formData.expire_end = ''
+    expireRange.value = null
     mode.value = 'add'
 }
 

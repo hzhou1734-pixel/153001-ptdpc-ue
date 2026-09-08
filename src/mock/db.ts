@@ -45,6 +45,8 @@ function makeList<T>(count: number, factory: (i: number) => T): T[] {
 // ---------------------------------------------------------------- 物业
 export const propertyDb = makeList(68, (i) => {
     const name = `${pick(surnames)}${pick(given1)}${pick(propertySuffix)}`
+    // 约半数物业设置了账号有效期（起止日期范围），起始不晚于今天、结束在未来 30~730 天
+    const hasExpire = rand() > 0.5
     return {
         id: 10001 + i,
         name,
@@ -53,7 +55,8 @@ export const propertyDb = makeList(68, (i) => {
         account: `wy${String(10001 + i)}`,
         password: '999999',
         status: rand() > 0.15 ? 1 : 0,
-        expire_time: rand() > 0.5 ? ago(-randInt(30, 365)) : '',
+        expire_start: hasExpire ? ago(randInt(0, 200)).slice(0, 10) : '',
+        expire_end: hasExpire ? ago(-randInt(30, 730)).slice(0, 10) : '',
         community_count: randInt(1, 12),
         user_count: randInt(200, 8000),
         order_count: randInt(500, 20000),

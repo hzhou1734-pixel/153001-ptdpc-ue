@@ -55,14 +55,17 @@
                 <el-table-column label="手机号码" prop="mobile" min-width="130" />
                 <el-table-column label="账号状态" min-width="100">
                     <template #default="{ row }">
-                        <el-tag :type="row.status == 1 ? 'success' : 'danger'">
-                            {{ row.status == 1 ? '启用' : '禁用' }}
-                        </el-tag>
+                        <el-switch
+                            :model-value="row.status"
+                            :active-value="1"
+                            :inactive-value="0"
+                            @change="handleStatusChange($event, row)"
+                        />
                     </template>
                 </el-table-column>
                 <el-table-column label="注册时间" prop="create_time" min-width="170" />
                 <el-table-column label="最后登录时间" prop="login_time" min-width="170" />
-                <el-table-column label="操作" width="180" fixed="right">
+                <el-table-column label="操作" width="100" fixed="right">
                     <template #default="{ row }">
                         <el-button type="primary" link>
                             <router-link
@@ -76,13 +79,6 @@
                                 详情
                             </router-link>
                         </el-button>
-                        <el-switch
-                            class="ml-2.5"
-                            :model-value="row.status"
-                            :active-value="1"
-                            :inactive-value="0"
-                            @change="handleStatusChange($event, row)"
-                        />
                     </template>
                 </el-table-column>
                 <template #empty>
