@@ -129,22 +129,18 @@
                 </el-table-column>
                 <el-table-column label="账号状态" min-width="100">
                     <template #default="{ row }">
-                        <el-tag :type="row.status == 1 ? 'success' : 'danger'">
-                            {{ row.status == 1 ? '启用' : '禁用' }}
-                        </el-tag>
-                    </template>
-                </el-table-column>
-                <el-table-column label="添加时间" prop="create_time" min-width="160" />
-                <el-table-column label="操作" width="220" fixed="right">
-                    <template #default="{ row }">
-                        <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
                         <el-switch
-                            class="mx-2.5"
                             :model-value="row.status"
                             :active-value="1"
                             :inactive-value="0"
                             @change="handleStatusChange($event, row)"
                         />
+                    </template>
+                </el-table-column>
+                <el-table-column label="添加时间" prop="create_time" min-width="160" />
+                <el-table-column label="操作" width="160" fixed="right">
+                    <template #default="{ row }">
+                        <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
                         <el-button type="danger" link @click="handleResetPwd(row)">
                             重置密码
                         </el-button>
