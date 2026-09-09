@@ -1,6 +1,11 @@
 <template>
     <div class="logo" @click="handleClick">
-        <image-contain :width="szie" :height="szie" :src="config.web_logo" />
+        <image-contain
+            :width="szie"
+            :height="szie"
+            :src="logoSrc"
+            @error="handleLogoError"
+        />
         <transition name="title-width">
             <div
                 v-show="showTitle"
@@ -23,6 +28,7 @@
 <script setup lang="ts">
 import { ThemeEnum } from '@/enums/appEnums'
 import useAppStore from '@/stores/modules/app'
+import guhaojiaIcon from '@/assets/images/guhaojia-icon.png'
 
 defineProps({
     szie: { type: Number, default: 34 },
@@ -33,6 +39,19 @@ defineProps({
 const appStore = useAppStore()
 const config = computed(() => appStore.config)
 const router = useRouter()
+
+// 后端下发的网站 logo（已规范化地址）
+const backendLogo = computed(() => config.value?.web_logo || '')
+// 后端 logo 为空或加载失败时，回退到本地顾好家图标，保证侧边栏不破图
+const useFallback = ref(false)
+const logoSrc = computed(() => (!useFallback.value && backendLogo.value) || guhaojiaIcon)
+const handleLogoError = () => {
+    useFallback.value = true
+}
+// 后端 logo 地址变化时重置回退状态
+watch(backendLogo, () => {
+    useFallback.value = false
+})
 
 const handleClick = () => {
     router.push('/')

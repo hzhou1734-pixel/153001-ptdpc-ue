@@ -119,5 +119,5 @@ export const GHJ_MENU: GhjMenuItem[] = [
     }
 ]
 
-/** 被本地菜单替代、需要从后端菜单中过滤掉的顶层路径（setting=后端「系统设置」，由本地底部「系统设置」system 替代） */
-export const GHJ_MENU_OVERRIDE_PATHS = ['workbench', 'consumer', 'permission', 'setting']
+/** 被本地菜单替代、需要从后端菜单中过滤掉的顶层路径（setting=后端「系统设置」，由本地底部「系统设置」system 替代；recharge=「充值设置」，系统无此功能，直接剔除） */
+export const GHJ_MENU_OVERRIDE_PATHS = ['workbench', 'consumer', 'permission', 'setting', 'recharge']

@@ -71,11 +71,25 @@ const useUserStore = defineStore({
                     .then((data) => {
                         this.userInfo = data.user
                         this.perms = data.permissions
-                        // 平台端业务菜单：过滤掉已被本地菜单替代的后端菜单，再合并本地顾好家菜单
-                        const backendMenu = (data.menu || []).filter(
-                            (item: any) => !GHJ_MENU_OVERRIDE_PATHS.includes(item.paths)
-                        )
-                        this.routes = filterAsyncRoutes([...backendMenu, ...GHJ_MENU])
+                        // 平台端业务菜单：过滤掉已被本地菜单替代/系统不存在的后端菜单，再合并本地顾好家菜单
+                        const backendMenu = (data.menu || [])
+                            .filter(
+                                (item: any) =>
+                                    !GHJ_MENU_OVERRIDE_PATHS.includes(item.paths) &&
+                                    item.name !== '充值设置'
+                            )
+                            // 兜底：剔除挂在保留目录下名为「充值设置」的子菜单
+                            .map((item: any) => {
+                                if (item.children?.length) {
+                                    item.children = item.children.filter(
+                                        (child: any) => child.name !== '充值设置'
+                                    )
+                                }
+                                return item
+                            })
+                            .filter((item: any) => item.type !== 'M' || item.children?.length)
+                        // 本地菜单在前，保证登录后默认落地页恒为「数据台」
+                        this.routes = filterAsyncRoutes([...GHJ_MENU, ...backendMenu])
                         resolve(data)
                     })
                     .catch((error) => {
