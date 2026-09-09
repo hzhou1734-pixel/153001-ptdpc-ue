@@ -3,7 +3,7 @@
         <div class="flex-1 flex items-center justify-center">
             <div class="login-card flex rounded-md overflow-hidden">
                 <div class="flex-1 h-full hidden md:inline-block">
-                    <image-contain :src="config.login_image" :width="400" height="100%" />
+                    <image-contain :src="loginImage" :width="400" height="100%" />
                 </div>
                 <div
                     class="login-form bg-body flex flex-col justify-center px-10 py-10 md:w-[400px] w-[375px] flex-none mx-auto"
@@ -59,6 +59,8 @@ import LayoutFooter from '@/layout/components/footer.vue'
 import useAppStore from '@/stores/modules/app'
 import useUserStore from '@/stores/modules/user'
 import cache from '@/utils/cache'
+
+import loginImage from './images/login-illustration.svg'
 
 const passwordRef = shallowRef<InputInstance>()
 const formRef = shallowRef<FormInstance>()
