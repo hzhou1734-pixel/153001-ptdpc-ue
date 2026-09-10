@@ -14,6 +14,9 @@ const IMAGE_KEYS = [
     'pc_ico'
 ]
 
+// 平台品牌名（后端下发的 web_name 为旧品牌，前端统一覆盖，侧边栏与登录页共用）
+const BRAND_NAME = '顾好家管理平台'
+
 interface AppSate {
     config: Record<string, any>
     isMobile: boolean
@@ -49,6 +52,11 @@ const useAppStore = defineStore({
                                 data[key] = normalizeImageUrl(data[key])
                             }
                         })
+                        // 品牌名统一覆盖
+                        data.web_name = BRAND_NAME
+                        if (!data.title) {
+                            data.title = BRAND_NAME
+                        }
                         this.config = data
                         resolve(data)
                     })
