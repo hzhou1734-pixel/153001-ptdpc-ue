@@ -63,12 +63,12 @@ export const GHJ_MENU: GhjMenuItem[] = [
         icon: 'local-icon-huodongguanli',
         is_show: 1,
         children: [
-            { type: 'C', name: '帖子列表', paths: 'post', component: 'ghj/content/post', is_show: 1 },
+            { type: 'C', name: '人力资源', paths: 'hr', component: 'ghj/content/hr', is_show: 1 },
             {
                 type: 'C',
-                name: '资源大厅',
-                paths: 'resource',
-                component: 'ghj/content/resource',
+                name: '人才库',
+                paths: 'talent',
+                component: 'ghj/content/talent',
                 is_show: 1
             },
             {

@@ -5,10 +5,12 @@ import {
     staffDb,
     userAuthDb,
     userBandDb,
+    userCoinDb,
     userDb,
     userJoinDb,
     userOrderDb,
-    userSettleDb
+    userSettleDb,
+    userTalentDb
 } from '@/mock/db'
 
 // ---------------------------------------------------------------- 用户
@@ -28,13 +30,8 @@ export function getUserDetail(params: { id: any }) {
         base: user,
         order: userOrderDb(Number(params.id)),
         settle: userSettleDb(),
-        post: [
-            { id: 1, image: '', title: '小区停车位改造建议', publish_time: new Date().toLocaleDateString(), audit_time: new Date().toLocaleDateString(), status: '已通过' },
-            { id: 2, image: '', title: '周末邻里义诊活动', publish_time: new Date().toLocaleDateString(), audit_time: new Date().toLocaleDateString(), status: '待审核' }
-        ],
-        resource: [
-            { id: 1, image: '', title: '闲置婴儿车一台', publish_time: new Date().toLocaleDateString(), audit_time: new Date().toLocaleDateString(), status: '已通过' }
-        ],
+        coin: userCoinDb(Number(params.id)),
+        talent: userTalentDb(),
         auth: userAuthDb(),
         band: userBandDb(),
         join: userJoinDb()

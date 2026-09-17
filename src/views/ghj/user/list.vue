@@ -53,6 +53,7 @@
                 </el-table-column>
                 <el-table-column label="昵称" prop="nickname" min-width="120" show-overflow-tooltip />
                 <el-table-column label="手机号码" prop="mobile" min-width="130" />
+                <el-table-column label="顾好家币" prop="coin" min-width="110" />
                 <el-table-column label="账号状态" min-width="100">
                     <template #default="{ row }">
                         <el-switch

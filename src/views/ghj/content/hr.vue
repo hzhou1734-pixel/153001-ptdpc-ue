@@ -1,12 +1,12 @@
-<!-- 资源大厅：查看邻里闲置资源发布内容与审核状态 -->
+<!-- 人力资源：查看用户提交的技能认证、审核状态及认证凭证 -->
 <template>
     <div>
         <el-card class="!border-none" shadow="never">
             <el-form class="mb-[-16px]" :model="queryParams" :inline="true">
-                <el-form-item class="w-[280px]" label="资源标题">
+                <el-form-item class="w-[280px]" label="技能标题">
                     <el-input
-                        v-model="queryParams.title"
-                        placeholder="请输入资源标题"
+                        v-model="queryParams.skill_title"
+                        placeholder="请输入认证技能标题"
                         clearable
                         @keyup.enter="resetPage"
                     />
@@ -27,7 +27,7 @@
                         @keyup.enter="resetPage"
                     />
                 </el-form-item>
-                <el-form-item class="w-[280px]" label="审核状态">
+                <el-form-item class="w-[200px]" label="审核状态">
                     <el-select v-model="queryParams.audit_status" placeholder="全部" clearable>
                         <el-option
                             v-for="item in auditStatusOptions"
@@ -54,7 +54,7 @@
                     <el-button @click="resetParams">重置</el-button>
                     <export-data
                         class="ml-2.5"
-                        :fetch-fun="getResourceList"
+                        :fetch-fun="getHrList"
                         :params="queryParams"
                         :page-size="pager.size"
                     />
@@ -63,14 +63,13 @@
         </el-card>
         <el-card class="!border-none mt-4" shadow="never">
             <el-table size="large" v-loading="pager.loading" :data="pager.lists">
-                <el-table-column label="封面图" width="100">
-                    <template #default="{ row }">
-                        <image-contain :src="row.image" :width="60" :height="60" fit="cover" />
-                    </template>
-                </el-table-column>
-                <el-table-column label="资源标题" prop="title" min-width="200" show-overflow-tooltip />
-                <el-table-column label="所属物业" prop="property_name" min-width="180" show-overflow-tooltip />
-                <el-table-column label="发布人" min-width="160">
+                <el-table-column
+                    label="认证技能标题"
+                    prop="skill_title"
+                    min-width="180"
+                    show-overflow-tooltip
+                />
+                <el-table-column label="提交用户" min-width="160">
                     <template #default="{ row }">
                         <div class="flex items-center">
                             <el-avatar :src="row.avatar" :size="40" />
@@ -79,6 +78,12 @@
                     </template>
                 </el-table-column>
                 <el-table-column label="手机号码" prop="mobile" min-width="130" />
+                <el-table-column label="认证凭证" min-width="100">
+                    <template #default="{ row }">
+                        <image-contain :src="row.credential" :width="60" :height="60" fit="cover" />
+                    </template>
+                </el-table-column>
+                <el-table-column label="提交时间" prop="submit_time" min-width="170" />
                 <el-table-column label="审核状态" min-width="110">
                     <template #default="{ row }">
                         <el-tag :type="getAuditStatusType(row.audit_status)">
@@ -86,11 +91,10 @@
                         </el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column label="提交时间" prop="submit_time" min-width="170" />
                 <el-table-column label="审核时间" prop="audit_time" min-width="170" />
                 <el-table-column label="操作" width="120" fixed="right">
                     <template #default="{ row }">
-                        <el-button type="primary" link @click="handleDetail(row)">资源详情</el-button>
+                        <el-button type="primary" link @click="handleDetail(row)">认证详情</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -99,40 +103,56 @@
             </div>
         </el-card>
 
-        <!-- 资源详情 -->
+        <!-- 认证详情 -->
         <popup
             ref="detailRef"
-            title="资源详情"
+            title="认证详情"
             width="700px"
             confirm-button-text="关闭"
             :cancel-button-text="false"
         >
             <div class="detail">
                 <div class="detail__item detail__item--full">
-                    <span class="detail__label">资源图片：</span>
-                    <image-contain :src="detail.image" :width="180" :height="120" fit="cover" />
+                    <span class="detail__label">提交用户：</span>
+                    <span>{{ detail.nickname || '-' }}（{{ detail.mobile || '-' }}）</span>
                 </div>
                 <div class="detail__item detail__item--full">
-                    <span class="detail__label">资源标题：</span>
-                    <span>{{ detail.title || '-' }}</span>
+                    <span class="detail__label">认证技能标题：</span>
+                    <span>{{ detail.skill_title || '-' }}</span>
                 </div>
                 <div class="detail__item detail__item--full">
-                    <span class="detail__label">详情内容：</span>
-                    <span>{{ detail.content || '-' }}</span>
+                    <span class="detail__label">技能信息：</span>
+                    <span>{{ detail.skill || '-' }}</span>
+                </div>
+                <div class="detail__item detail__item--full">
+                    <span class="detail__label">详情描述：</span>
+                    <span>{{ detail.desc || '-' }}</span>
+                </div>
+                <div class="detail__item detail__item--full">
+                    <span class="detail__label">认证凭证：</span>
+                    <image-contain :src="detail.credential" :width="180" :height="120" fit="cover" />
+                </div>
+                <div class="detail__item">
+                    <span class="detail__label">审核状态：</span>
+                    <span>{{ detail.audit_status || '-' }}</span>
+                </div>
+                <div class="detail__item">
+                    <span class="detail__label">审核时间：</span>
+                    <span>{{ detail.audit_time || '-' }}</span>
                 </div>
             </div>
         </popup>
     </div>
 </template>
 
-<script lang="ts" setup name="ghjContentResource">
-import { getResourceDetail, getResourceList } from '@/api/ghj/content'
+<script lang="ts" setup name="ghjContentHr">
+import { getHrDetail, getHrList } from '@/api/ghj/content'
 import Popup from '@/components/popup/index.vue'
 
 import { usePaging } from '@/hooks/usePaging'
 
 const queryParams = reactive({
-    title: '',
+    skill_title: '',
     nickname: '',
     mobile: '',
     audit_status: '',
@@ -143,7 +163,7 @@ const queryParams = reactive({
 })
 
 const { pager, getLists, resetPage, resetParams } = usePaging({
-    fetchFun: getResourceList,
+    fetchFun: getHrList,
     params: queryParams
 })
 
@@ -156,14 +176,14 @@ const getAuditStatusType = (status: any) => {
     return 'warning'
 }
 
-// ------------------------------------------------ 资源详情
+// ------------------------------------------------ 认证详情
 const detailRef = shallowRef<InstanceType<typeof Popup>>()
 const detail = ref<any>({})
 
 const handleDetail = async (row: any) => {
     detail.value = {}
     detailRef.value?.open()
-    detail.value = await getResourceDetail({ id: row.id })
+    detail.value = await getHrDetail({ id: row.id })
 }
 
 onActivated(() => {

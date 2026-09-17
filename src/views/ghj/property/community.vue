@@ -28,9 +28,39 @@
                         />
                     </el-select>
                 </el-form-item>
-                <el-form-item class="w-[280px]" label="城市">
-                    <el-select v-model="queryParams.city" placeholder="全部" clearable>
+                <el-form-item class="w-[200px]" label="省份">
+                    <el-select
+                        v-model="queryParams.province"
+                        placeholder="全部"
+                        clearable
+                        @change="handleProvinceChange"
+                    >
+                        <el-option
+                            v-for="item in provinceOptions"
+                            :key="item"
+                            :label="item"
+                            :value="item"
+                        />
+                    </el-select>
+                </el-form-item>
+                <el-form-item class="w-[200px]" label="城市">
+                    <el-select
+                        v-model="queryParams.city"
+                        placeholder="全部"
+                        clearable
+                        @change="handleCityChange"
+                    >
                         <el-option v-for="item in cityOptions" :key="item" :label="item" :value="item" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item class="w-[200px]" label="区/县">
+                    <el-select v-model="queryParams.district" placeholder="全部" clearable>
+                        <el-option
+                            v-for="item in districtOptions"
+                            :key="item"
+                            :label="item"
+                            :value="item"
+                        />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="创建时间">
@@ -127,7 +157,12 @@
 </template>
 
 <script lang="ts" setup name="ghjPropertyCommunity">
-import { getCommunityDetail, getCommunityList, getPropertyOptions } from '@/api/ghj/property'
+import {
+    getCommunityDetail,
+    getCommunityList,
+    getPropertyOptions,
+    getRegionOptions
+} from '@/api/ghj/property'
 import Popup from '@/components/popup/index.vue'
 
 import { usePaging } from '@/hooks/usePaging'
@@ -135,7 +170,9 @@ import { usePaging } from '@/hooks/usePaging'
 const queryParams = reactive({
     keyword: '',
     property_id: '',
+    province: '',
     city: '',
+    district: '',
     start_time: '',
     end_time: ''
 })
@@ -146,7 +183,54 @@ const { pager, getLists, resetPage, resetParams } = usePaging({
 })
 
 // 城市下拉（与物业端维护的城市保持一致）
-const cityOptions = ['长沙市', '株洲市', '湘潭市', '衡阳市', '岳阳市', '常德市', '郴州市', '永州市']
+// 省市区级联：province -> city -> district
+const regionTree = ref<Record<string, Record<string, string[]>>>({})
+const getRegionOptionsList = async () => {
+    const res: any = await getRegionOptions()
+    regionTree.value = res?.tree || {}
+}
+
+const provinceOptions = computed(() => Object.keys(regionTree.value))
+
+const cityOptions = computed(() => {
+    const province = queryParams.province
+    if (!province) {
+        // 未选省份时展示全部城市
+        const set = new Set<string>()
+        Object.values(regionTree.value).forEach((cities) => Object.keys(cities).forEach((c) => set.add(c)))
+        return Array.from(set)
+    }
+    return Object.keys(regionTree.value[province] || {})
+})
+
+const districtOptions = computed(() => {
+    const province = queryParams.province
+    const city = queryParams.city
+    if (!province) {
+        const set = new Set<string>()
+        Object.values(regionTree.value).forEach((cities) =>
+            Object.values(cities).forEach((ds) => ds.forEach((d) => set.add(d)))
+        )
+        return Array.from(set)
+    }
+    const cities = regionTree.value[province] || {}
+    if (!city) {
+        const set = new Set<string>()
+        Object.values(cities).forEach((ds) => ds.forEach((d) => set.add(d)))
+        return Array.from(set)
+    }
+    return cities[city] || []
+})
+
+// 切换省份：清空下级城市与区县
+const handleProvinceChange = () => {
+    queryParams.city = ''
+    queryParams.district = ''
+}
+// 切换城市：清空下级区县
+const handleCityChange = () => {
+    queryParams.district = ''
+}
 
 // 所属物业下拉
 const propertyOptions = ref<any[]>([])
@@ -176,6 +260,7 @@ onActivated(() => {
 })
 
 getPropertyOptionsList()
+getRegionOptionsList()
 getLists()
 </script>
 

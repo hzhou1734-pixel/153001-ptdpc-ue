@@ -63,6 +63,19 @@ export function getCommunityDetail(params: { id: any }) {
     return delay(communityDb.find((i) => String(i.id) === String(params.id)) || {})
 }
 
+// 省市区级联选项：province -> city -> district
+export function getRegionOptions() {
+    const tree: Record<string, Record<string, string[]>> = {}
+    communityDb.forEach((item: any) => {
+        if (!tree[item.province]) tree[item.province] = {}
+        if (!tree[item.province][item.city]) tree[item.province][item.city] = []
+        if (!tree[item.province][item.city].includes(item.district)) {
+            tree[item.province][item.city].push(item.district)
+        }
+    })
+    return delay({ tree, provinces: Object.keys(tree) })
+}
+
 export function getPropertyOptions() {
     return delay(propertyDb.map((i) => ({ id: i.id, name: i.name })))
 }

@@ -38,7 +38,6 @@ const ago = (days: number, hours = 0) =>
 export const GHJ_STATUS = { NORMAL: 1, DISABLE: 0 }
 
 // 静态示例图片（public/mock-img 下按业务场景预置的 SVG），按索引确定性取值
-const POST_IMGS = makeList(7, (i) => `${import.meta.env.BASE_URL}mock-img/post/${i}.svg`)
 const RESOURCE_IMGS = makeList(7, (i) => `${import.meta.env.BASE_URL}mock-img/resource/${i}.svg`)
 const ACTIVITY_IMGS = makeList(7, (i) => `${import.meta.env.BASE_URL}mock-img/activity/${i}.svg`)
 const WONDERFUL_IMGS = makeList(5, (i) => `${import.meta.env.BASE_URL}mock-img/wonderful/${i}.svg`)
@@ -111,6 +110,7 @@ export const userDb = makeList(260, (i) => {
         order_count: randInt(0, 120),
         total_amount: randInt(0, 5000000) / 100,
         settle_amount: randInt(0, 3000000) / 100,
+        coin: randInt(0, 5000),
         community_name: pick(communityDb).name
     }
 })
@@ -181,94 +181,94 @@ export const staffDb = makeList(96, (i) => {
     }
 })
 
-// ---------------------------------------------------------------- 内容：帖子
-export const postDb = makeList(72, (i) => {
+// ---------------------------------------------------------------- 内容：人力资源（用户提交的技能认证）
+export const hrDb = makeList(72, (i) => {
     const u = pick(userDb)
-    const c = pick(communityDb)
     return {
         id: 90001 + i,
-        image: POST_IMGS[i % POST_IMGS.length],
-        title: pick([
-            '小区停车位改造建议',
-            '周末邻里义诊活动通知',
-            '楼下早餐店推荐',
-            '楼道灯坏了谁来修',
-            '社区健身器材使用感受',
-            '老人手机课堂报名啦',
-            '宠物便便箱位置建议'
+        skill_title: pick([
+            '居家养老陪护',
+            '母婴护理月嫂',
+            '专业陪诊就医',
+            '社区营养膳食',
+            '康复理疗推拿',
+            '家政保洁收纳',
+            '家电维修安装',
+            '老年健康管理'
         ]),
-        property_name: c.property_name,
         avatar: AVATAR_IMGS[(i + 1) % AVATAR_IMGS.length],
         nickname: u.nickname,
         mobile: u.mobile,
+        credential: RESOURCE_IMGS[i % RESOURCE_IMGS.length],
+        skill: pick(['居家养老陪护', '母婴护理月嫂', '专业陪诊就医', '社区营养膳食', '康复理疗推拿']),
+        desc: `认证详情示例（#${i + 1}）：本人具备相关服务资质与${randInt(1, 10)}年实操经验，可接受平台派单，服务区域为所在社区周边。`,
         audit_status: pick(['待审核', '已通过', '已驳回']),
         submit_time: ago(randInt(0, 60)),
-        audit_time: ago(randInt(0, 50)),
-        like_count: randInt(0, 800),
-        comment_count: randInt(0, 200),
-        content: `这是帖子详情内容示例（#${i + 1}）。社区生活需要大家共同参与，欢迎邻居们在评论区留言交流，共建和谐社区环境。`
+        audit_time: ago(randInt(0, 50))
     }
 })
 
-// 帖子评论（两级结构：父评论 + replies 子回复）
-export const postCommentDb = (postId: number) =>
-    makeList(randInt(2, 6), (i) => ({
-        id: 100001 + i,
-        post_id: postId,
-        avatar: AVATAR_IMGS[(i + 4) % AVATAR_IMGS.length],
-        nickname: `${pick(surnames)}${pick(given1)}`,
-        content: pick([
-            '说得太对了，支持！',
-            '我也遇到同样的问题',
-            '物业什么时候处理一下',
-            '感谢分享，已收藏',
-            '希望能尽快改进'
-        ]),
-        create_time: ago(randInt(0, 30)),
-        replies: makeList(randInt(0, 3), (j) => ({
-            id: 200001 + i * 100 + j,
-            post_id: postId,
-            parent_id: 100001 + i,
-            avatar: AVATAR_IMGS[(i + j + 6) % AVATAR_IMGS.length],
-            nickname: `${pick(surnames)}${pick(given1)}`,
-            reply_nickname: '',
-            content: pick([
-                '同意楼上的说法',
-                '已经反馈给物业了',
-                '明天一起去看看？',
-                '同求进展，蹲一个后续',
-                '好的，谢谢告知'
-            ]),
-            create_time: ago(randInt(0, 15))
-        }))
+// 用户：顾好家币明细（按所属物业维度展示余额与变动记录）
+export const userCoinDb = (userId: number) =>
+    makeList(randInt(3, 10), (i) => ({
+        id: 190001 + i,
+        property_name: pick(communityDb).property_name,
+        change: (rand() > 0.5 ? 1 : -1) * randInt(10, 500),
+        balance: randInt(0, 5000),
+        remark: pick(['订单消费', '服务奖励', '活动赠送', '提现扣除']),
+        create_time: ago(randInt(0, 200))
     }))
 
-// ---------------------------------------------------------------- 内容：资源大厅
-export const resourceDb = makeList(58, (i) => {
+// 用户：人才中心（认证的人才类型 / 资质证件 / 审核状态 / 历史接单）
+export const userTalentDb = () => ({
+    talent_type: pick(['陪诊员', '托管员', '膳食配送员', '康复理疗师', '家政服务员']),
+    credential: RESOURCE_IMGS[randInt(0, RESOURCE_IMGS.length - 1)],
+    audit_status: pick(['审核中', '已通过', '已驳回']),
+    order_history: makeList(randInt(2, 8), (i) => ({
+        id: 200001 + i,
+        title: pick(['上门陪诊服务', '老人日间托管', '社区营养膳食配送', '康复理疗服务']),
+        amount: randInt(1000, 200000) / 100,
+        status: pick(['已完成', '已取消', '服务中']),
+        create_time: ago(randInt(0, 150))
+    }))
+})
+
+// ---------------------------------------------------------------- 内容：人才库（通过认证的人才）
+export const talentDb = makeList(58, (i) => {
     const u = pick(userDb)
-    const c = pick(communityDb)
+    const inProgress = randInt(0, 20)
+    const completed = randInt(0, 120)
+    const cancelled = randInt(0, 30)
     return {
         id: 110001 + i,
-        image: RESOURCE_IMGS[i % RESOURCE_IMGS.length],
-        title: pick([
-            '闲置婴儿车一台',
-            '搬家纸箱免费自取',
-            '儿童绘本交换',
-            '全新轮椅借用',
-            '二手空调转让',
-            '电动工具短期借用',
-            '宠物寄养互助'
-        ]),
-        property_name: c.property_name,
         avatar: AVATAR_IMGS[(i + 2) % AVATAR_IMGS.length],
         nickname: u.nickname,
         mobile: u.mobile,
-        audit_status: pick(['待审核', '已通过', '已驳回']),
-        submit_time: ago(randInt(0, 60)),
-        audit_time: ago(randInt(0, 50)),
-        content: `资源详情内容示例（#${i + 1}）：物品九成新，位于小区内可自提，联系方式见发布人手机号，非诚勿扰。`
+        skill: pick(['居家养老陪护', '母婴护理月嫂', '专业陪诊就医', '社区营养膳食', '康复理疗推拿', '家政保洁收纳']),
+        category: pick(['陪诊', '托管', '膳食', '康复', '家政']),
+        order_total: inProgress + completed + cancelled,
+        in_progress: inProgress,
+        completed: completed,
+        cancelled: cancelled,
+        finish_amount: completed * randInt(800, 5000) / 10,
+        talent_status: rand() > 0.15 ? 1 : 0,
+        create_time: ago(randInt(1, 300))
     }
 })
+
+// 人才：订单信息（统计 + 订单列表）
+export const talentOrderDb = (talentId: number) =>
+    makeList(randInt(3, 10), (i) => ({
+        id: 210001 + i,
+        cover: ACTIVITY_IMGS[i % ACTIVITY_IMGS.length],
+        title: pick(['上门陪诊服务', '老人日间托管', '社区营养膳食配送', '康复理疗服务', '家政保洁服务']),
+        amount: randInt(1000, 200000) / 100,
+        user: `${pick(surnames)}${pick(given1)}`,
+        status: pick(['待接单', '服务中', '已完成', '已取消']),
+        comment: pick(['服务很专业，点赞', '准时到位，态度好', '整体满意', '还能更细致些']),
+        submit_time: ago(randInt(0, 120)),
+        finish_time: ago(randInt(0, 90))
+    }))
 
 // ---------------------------------------------------------------- 内容：敏感词
 export const sensitiveDb = makeList(36, (i) => ({

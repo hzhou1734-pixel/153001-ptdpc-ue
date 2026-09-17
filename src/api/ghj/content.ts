@@ -2,24 +2,23 @@ import {
     activityDb,
     activityRecordDb,
     delay,
+    hrDb,
     inRange,
     nextId,
     noticeDb,
     paginate,
-    postCommentDb,
-    postDb,
-    resourceDb,
     sensitiveDb,
+    talentDb,
+    talentOrderDb,
     wonderfulDb
 } from '@/mock/db'
 
-// ---------------------------------------------------------------- 帖子
-export function getPostList(params: Record<string, any>) {
-    const list = paginate(postDb, params, {
-        title: (item, v) => item.title.includes(v),
+// ---------------------------------------------------------------- 人力资源
+export function getHrList(params: Record<string, any>) {
+    const list = paginate(hrDb, params, {
+        skill_title: (item, v) => item.skill_title.includes(v),
         nickname: (item, v) => item.nickname.includes(v),
-        property_name: (item, v) => item.property_name.includes(v),
-        property_id: (item, v) => item.property_name.includes(v),
+        mobile: (item, v) => item.mobile.includes(v),
         audit_status: (item, v) => item.audit_status === v,
         start_time: (item, v) => inRange(item.submit_time, v, params.end_time),
         audit_start: (item, v) => inRange(item.audit_time, v, params.audit_end)
@@ -27,26 +26,27 @@ export function getPostList(params: Record<string, any>) {
     return delay(list)
 }
 
-export function getPostDetail(params: { id: any }) {
-    const post: any = postDb.find((i) => String(i.id) === String(params.id)) || {}
-    return delay({ ...post, comments: postCommentDb(Number(params.id)) })
+export function getHrDetail(params: { id: any }) {
+    const hr: any = hrDb.find((i) => String(i.id) === String(params.id)) || {}
+    return delay({ ...hr })
 }
 
-// ---------------------------------------------------------------- 资源大厅
-export function getResourceList(params: Record<string, any>) {
-    const list = paginate(resourceDb, params, {
-        title: (item, v) => item.title.includes(v),
+// ---------------------------------------------------------------- 人才库
+export function getTalentList(params: Record<string, any>) {
+    const list = paginate(talentDb, params, {
         nickname: (item, v) => item.nickname.includes(v),
-        property_name: (item, v) => item.property_name.includes(v),
-        audit_status: (item, v) => item.audit_status === v,
-        start_time: (item, v) => inRange(item.submit_time, v, params.end_time),
-        audit_start: (item, v) => inRange(item.audit_time, v, params.audit_end)
+        mobile: (item, v) => item.mobile.includes(v),
+        skill: (item, v) => item.skill.includes(v),
+        category: (item, v) => item.category === v,
+        talent_status: (item, v) => String(item.talent_status) === String(v),
+        start_time: (item, v) => inRange(item.create_time, v, params.end_time)
     })
     return delay(list)
 }
 
-export function getResourceDetail(params: { id: any }) {
-    return delay(resourceDb.find((i) => String(i.id) === String(params.id)) || {})
+export function getTalentDetail(params: { id: any }) {
+    const talent: any = talentDb.find((i) => String(i.id) === String(params.id)) || {}
+    return delay({ ...talent, orders: talentOrderDb(Number(params.id)) })
 }
 
 // ---------------------------------------------------------------- 敏感词

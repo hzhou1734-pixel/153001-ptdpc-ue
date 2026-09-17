@@ -1,4 +1,4 @@
-<!-- 用户详情：基础信息 / 订单 / 结算 / 帖子 / 资源 / 认证 / 手环 / 报名 八个维度 -->
+<!-- 用户详情：基础信息 / 订单 / 结算 / 顾好家币 / 人才中心 / 业主认证 / 健康手环 / 报名 八个维度 -->
 <template>
     <div>
         <el-card class="!border-none" shadow="never">
@@ -28,6 +28,9 @@
                         </el-descriptions-item>
                         <el-descriptions-item label="手机号码">
                             {{ detail.base?.mobile || '-' }}
+                        </el-descriptions-item>
+                        <el-descriptions-item label="顾好家币">
+                            {{ detail.base?.coin ?? 0 }}
                         </el-descriptions-item>
                         <el-descriptions-item label="账号状态">
                             <el-tag :type="detail.base?.status == 1 ? 'success' : 'danger'">
@@ -111,56 +114,88 @@
                     </el-table>
                 </el-tab-pane>
 
-                <!-- 帖子发布 -->
-                <el-tab-pane label="帖子发布" name="post">
-                    <el-table class="mt-4" size="large" :data="detail.post">
-                        <el-table-column label="帖子图片" min-width="90">
+                <!-- 顾好家币：切换所属物业，查看该物业下账户余额与明细 -->
+                <el-tab-pane label="顾好家币" name="coin">
+                    <div class="flex items-center mt-4">
+                        <span class="mr-2 text-sm text-tx-secondary">所属物业</span>
+                        <el-select
+                            v-model="coinProperty"
+                            placeholder="全部物业"
+                            clearable
+                            filterable
+                            class="w-[280px]"
+                        >
+                            <el-option
+                                v-for="item in coinPropertyOptions"
+                                :key="item"
+                                :label="item"
+                                :value="item"
+                            />
+                        </el-select>
+                        <span class="ml-6 text-sm text-tx-secondary">
+                            账户余额：<span class="text-base font-medium text-tx-primary">{{
+                                coinBalance
+                            }}</span>
+                        </span>
+                    </div>
+                    <el-table class="mt-4" size="large" :data="filteredCoin">
+                        <el-table-column label="所属物业" prop="property_name" min-width="220" show-overflow-tooltip />
+                        <el-table-column label="变动" min-width="110">
                             <template #default="{ row }">
-                                <el-avatar :src="row.image" :size="50" shape="square">
-                                    {{ getFirstChar(row.title) }}
-                                </el-avatar>
+                                <span :class="Number(row.change) >= 0 ? 'text-success' : 'text-error'">
+                                    {{ Number(row.change) >= 0 ? '+' : '' }}{{ row.change }}
+                                </span>
                             </template>
                         </el-table-column>
-                        <el-table-column label="标题" prop="title" min-width="200" show-overflow-tooltip />
-                        <el-table-column label="发布时间" prop="publish_time" min-width="170" />
-                        <el-table-column label="审核时间" prop="audit_time" min-width="170" />
-                        <el-table-column label="帖子状态" prop="status" min-width="100" />
-                        <el-table-column label="操作" width="120" fixed="right">
-                            <template #default="{ row }">
-                                <el-button type="primary" link @click="handlePostDetail(row)">
-                                    查看详情
-                                </el-button>
-                            </template>
-                        </el-table-column>
+                        <el-table-column label="账户余额" prop="balance" min-width="110" />
+                        <el-table-column label="说明" prop="remark" min-width="130" />
+                        <el-table-column label="时间" prop="create_time" min-width="170" />
                         <template #empty>
-                            <el-empty description="暂无帖子数据" />
+                            <el-empty description="暂无顾好家币明细" />
                         </template>
                     </el-table>
                 </el-tab-pane>
 
-                <!-- 资源大厅 -->
-                <el-tab-pane label="资源大厅" name="resource">
-                    <el-table class="mt-4" size="large" :data="detail.resource">
-                        <el-table-column label="图片" min-width="90">
+                <!-- 人才中心：人才类型 / 资质证件 / 审核状态 / 历史接单 -->
+                <el-tab-pane label="人才中心" name="talent">
+                    <el-descriptions :column="2" border class="mt-4">
+                        <el-descriptions-item label="人才类型">
+                            {{ detail.talent?.talent_type || '-' }}
+                        </el-descriptions-item>
+                        <el-descriptions-item label="审核状态">
+                            <el-tag
+                                :type="
+                                    detail.talent?.audit_status === '已通过'
+                                        ? 'success'
+                                        : detail.talent?.audit_status === '已驳回'
+                                          ? 'danger'
+                                          : 'warning'
+                                "
+                            >
+                                {{ detail.talent?.audit_status || '-' }}
+                            </el-tag>
+                        </el-descriptions-item>
+                        <el-descriptions-item label="资质证件">
+                            <image-contain
+                                :src="detail.talent?.credential"
+                                :width="120"
+                                :height="80"
+                                fit="cover"
+                            />
+                        </el-descriptions-item>
+                    </el-descriptions>
+                    <div class="mt-4 text-sm text-tx-secondary">历史接单记录</div>
+                    <el-table class="mt-2" size="large" :data="detail.talent?.order_history || []">
+                        <el-table-column label="服务标题" prop="title" min-width="200" show-overflow-tooltip />
+                        <el-table-column label="订单金额" min-width="120">
                             <template #default="{ row }">
-                                <el-avatar :src="row.image" :size="50" shape="square">
-                                    {{ getFirstChar(row.title) }}
-                                </el-avatar>
+                                {{ formatMoney(row.amount) }}
                             </template>
                         </el-table-column>
-                        <el-table-column label="标题" prop="title" min-width="200" show-overflow-tooltip />
-                        <el-table-column label="发布时间" prop="publish_time" min-width="170" />
-                        <el-table-column label="审核时间" prop="audit_time" min-width="170" />
-                        <el-table-column label="资源状态" prop="status" min-width="100" />
-                        <el-table-column label="操作" width="120" fixed="right">
-                            <template #default="{ row }">
-                                <el-button type="primary" link @click="handleResourceDetail(row)">
-                                    查看详情
-                                </el-button>
-                            </template>
-                        </el-table-column>
+                        <el-table-column label="订单状态" prop="status" min-width="110" />
+                        <el-table-column label="接单时间" prop="create_time" min-width="170" />
                         <template #empty>
-                            <el-empty description="暂无资源数据" />
+                            <el-empty description="暂无接单记录" />
                         </template>
                     </el-table>
                 </el-tab-pane>
@@ -243,69 +278,6 @@
             </div>
         </popup>
 
-        <!-- 帖子详情 -->
-        <popup
-            ref="postRef"
-            title="帖子详情"
-            width="600px"
-            confirm-button-text="关闭"
-            :cancel-button-text="false"
-        >
-            <div class="detail">
-                <div class="detail__item detail__item--full">
-                    <span class="detail__label">标题：</span>
-                    <span>{{ currentRow.title || '-' }}</span>
-                </div>
-                <div class="detail__item">
-                    <span class="detail__label">发布时间：</span>
-                    <span>{{ currentRow.publish_time || '-' }}</span>
-                </div>
-                <div class="detail__item">
-                    <span class="detail__label">审核时间：</span>
-                    <span>{{ currentRow.audit_time || '-' }}</span>
-                </div>
-                <div class="detail__item detail__item--full">
-                    <span class="detail__label">帖子内容：</span>
-                    <span>{{ currentRow.content || '暂无内容' }}</span>
-                </div>
-                <div class="detail__item detail__item--full">
-                    <span class="detail__label">帖子评价：</span>
-                    <span>{{ currentRow.comment || '暂无评价' }}</span>
-                </div>
-            </div>
-        </popup>
-
-        <!-- 资源详情 -->
-        <popup
-            ref="resourceRef"
-            title="资源详情"
-            width="600px"
-            confirm-button-text="关闭"
-            :cancel-button-text="false"
-        >
-            <div class="detail">
-                <div class="detail__item detail__item--full">
-                    <span class="detail__label">标题：</span>
-                    <span>{{ currentRow.title || '-' }}</span>
-                </div>
-                <div class="detail__item">
-                    <span class="detail__label">发布时间：</span>
-                    <span>{{ currentRow.publish_time || '-' }}</span>
-                </div>
-                <div class="detail__item">
-                    <span class="detail__label">审核时间：</span>
-                    <span>{{ currentRow.audit_time || '-' }}</span>
-                </div>
-                <div class="detail__item detail__item--full">
-                    <span class="detail__label">资源状态：</span>
-                    <span>{{ currentRow.status || '-' }}</span>
-                </div>
-                <div class="detail__item detail__item--full">
-                    <span class="detail__label">资源内容：</span>
-                    <span>{{ currentRow.content || '暂无内容' }}</span>
-                </div>
-            </div>
-        </popup>
     </div>
 </template>
 
@@ -321,8 +293,8 @@ const detail = reactive<any>({
     base: {},
     order: [],
     settle: [],
-    post: [],
-    resource: [],
+    coin: [],
+    talent: {},
     auth: [],
     band: [],
     join: []
@@ -350,23 +322,31 @@ const settleSummary = computed(() => {
     return result
 })
 
+// ------------------------------------------------ 顾好家币：按所属物业筛选
+const coinProperty = ref('')
+const coinPropertyOptions = computed(() => {
+    const set = new Set<string>()
+    ;(detail.coin || []).forEach((item: any) => item.property_name && set.add(item.property_name))
+    return Array.from(set)
+})
+const filteredCoin = computed(() =>
+    coinProperty.value
+        ? (detail.coin || []).filter((item: any) => item.property_name === coinProperty.value)
+        : detail.coin || []
+)
+// 账户余额取所选物业最新一条明细的余额
+const coinBalance = computed(() => {
+    const list = filteredCoin.value as any[]
+    return list.length ? (list[list.length - 1]?.balance ?? 0) : 0
+})
+
 // ------------------------------------------------ 弹窗详情
 const settleRef = shallowRef<any>()
-const postRef = shallowRef<any>()
-const resourceRef = shallowRef<any>()
 const currentRow = ref<any>({})
 
 const handleSettleDetail = (row: any) => {
     currentRow.value = row
     settleRef.value?.open()
-}
-const handlePostDetail = (row: any) => {
-    currentRow.value = row
-    postRef.value?.open()
-}
-const handleResourceDetail = (row: any) => {
-    currentRow.value = row
-    resourceRef.value?.open()
 }
 
 // ------------------------------------------------ 返回
@@ -380,8 +360,8 @@ const getDetail = async () => {
     detail.base = res?.base || {}
     detail.order = res?.order || []
     detail.settle = res?.settle || []
-    detail.post = res?.post || []
-    detail.resource = res?.resource || []
+    detail.coin = res?.coin || []
+    detail.talent = res?.talent || {}
     detail.auth = res?.auth || []
     detail.band = res?.band || []
     detail.join = res?.join || []
