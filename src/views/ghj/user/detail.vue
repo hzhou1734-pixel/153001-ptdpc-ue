@@ -117,13 +117,14 @@
                 <!-- 顾好家币：切换所属物业，查看该物业下账户余额与明细 -->
                 <el-tab-pane label="顾好家币" name="coin">
                     <div class="flex items-center mt-4">
-                        <span class="mr-2 text-sm text-tx-secondary">所属物业</span>
+                        <span class="mr-2 shrink-0 whitespace-nowrap text-sm text-tx-secondary">所属物业</span>
                         <el-select
                             v-model="coinProperty"
                             placeholder="全部物业"
                             clearable
                             filterable
-                            class="w-[280px]"
+                            style="width: 220px"
+                            class="shrink-0"
                         >
                             <el-option
                                 v-for="item in coinPropertyOptions"
@@ -132,7 +133,7 @@
                                 :value="item"
                             />
                         </el-select>
-                        <span class="ml-6 text-sm text-tx-secondary">
+                        <span class="ml-auto shrink-0 whitespace-nowrap text-sm text-tx-secondary">
                             账户余额：<span class="text-base font-medium text-tx-primary">{{
                                 coinBalance
                             }}</span>
