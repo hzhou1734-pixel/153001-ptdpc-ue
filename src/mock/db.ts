@@ -402,18 +402,22 @@ export const talentDb = makeList(58, (i) => {
 
 // 人才：订单信息（统计 + 订单列表）
 export const talentOrderDb = (talentId: number) =>
-    makeList(randInt(3, 10), (i) => ({
-        id: 210001 + i,
-        order_no: `GJ${randInt(100000000000, 999999999999)}`,
-        cover: ACTIVITY_IMGS[i % ACTIVITY_IMGS.length],
-        title: pick(['上门陪诊服务', '老人日间托管', '社区营养膳食配送', '康复理疗服务', '家政保洁服务']),
-        amount: randInt(1000, 200000) / 100,
-        user: `${pick(surnames)}${pick(given1)}`,
-        status: pick(['待接单', '服务中', '已完成', '已取消']),
-        comment: pick(['服务很专业，点赞', '准时到位，态度好', '整体满意', '还能更细致些']),
-        submit_time: ago(randInt(0, 120)),
-        finish_time: ago(randInt(0, 90))
-    }))
+    makeList(randInt(3, 10), (i) => {
+        const status = pick(['待接单', '服务中', '已完成', '已取消'])
+        return {
+            id: 210001 + i,
+            order_no: `GJ${randInt(100000000000, 999999999999)}`,
+            cover: ACTIVITY_IMGS[i % ACTIVITY_IMGS.length],
+            title: pick(['上门陪诊服务', '老人日间托管', '社区营养膳食配送', '康复理疗服务', '家政保洁服务']),
+            amount: randInt(1000, 200000) / 100,
+            user: `${pick(surnames)}${pick(given1)}`,
+            status,
+            // 仅已完成订单有评星（1-5 星，偏好评）
+            star: status === '已完成' ? pick([5, 5, 5, 4, 4, 4, 3, 2]) : 0,
+            submit_time: ago(randInt(0, 120)),
+            finish_time: ago(randInt(0, 90))
+        }
+    })
 
 // ---------------------------------------------------------------- 内容：敏感词
 export const sensitiveDb = makeList(36, (i) => ({

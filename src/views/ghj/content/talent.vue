@@ -214,12 +214,17 @@
                         </el-table-column>
                         <el-table-column label="下单用户" prop="user" min-width="110" />
                         <el-table-column label="订单状态" prop="status" min-width="100" />
-                        <el-table-column
-                            label="订单评价"
-                            prop="comment"
-                            min-width="170"
-                            show-overflow-tooltip
-                        />
+                        <el-table-column label="订单评价" min-width="150">
+                            <template #default="{ row }">
+                                <el-rate
+                                    v-if="row.star"
+                                    :model-value="row.star"
+                                    disabled
+                                    size="small"
+                                />
+                                <span v-else>-</span>
+                            </template>
+                        </el-table-column>
                         <el-table-column label="提交时间" prop="submit_time" min-width="160" />
                         <el-table-column label="完成时间" prop="finish_time" min-width="160" />
                     </el-table>
