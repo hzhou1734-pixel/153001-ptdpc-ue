@@ -183,7 +183,7 @@ export function wonderfulStatus(params: { id: any; status: string }) {
 export function getBoardingList(params: Record<string, any>) {
     const list = paginate(boardingDb, params, {
         title: (item, v) => item.title.includes(v),
-        type: (item, v) => item.type === v,
+        property_name: (item, v) => item.property_name.includes(v),
         status: (item, v) => item.status === v,
         start_time: (item, v) => inRange(item.create_time, v, params.end_time)
     })

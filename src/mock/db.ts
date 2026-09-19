@@ -525,16 +525,24 @@ const SERVICE_IMGS = makeList(7, (i) => `${import.meta.env.BASE_URL}mock-img/pos
 
 // ---------------------------------------------------------------- 运营管理：托管服务（物业后台添加，平台仅查看 + 显示/下架）
 export const boardingDb = makeList(28, (i) => {
-    const type = pick(['老人日间托管', '暑期儿童托管', '术后康复陪护'])
+    const c = pick(communityDb)
+    const scene = pick(['老人日间托管', '暑期儿童托管', '术后康复陪护', '长者全托照护'])
+    const priceDesc = pick([
+        '含营养膳食、午休看护与休闲活动',
+        '提供全天候生活照料与健康管理',
+        '专业护工一对一陪伴，安全无忧',
+        '配备适老化设施与应急医护响应'
+    ])
     return {
         id: 210001 + i,
-        title: `${pick(['安心', '暖心', '贴心', '专业'])}${type}`,
-        type,
+        title: `${pick(['安心', '暖心', '贴心', '专业'])}${scene}`,
+        property_name: c.property_name,
         half_price: randInt(30, 120),
         full_price: randInt(80, 260),
         status: pick(['显示中', '已下架']),
         sort: randInt(0, 100),
-        create_time: ago(randInt(0, 120), randInt(0, 23))
+        create_time: ago(randInt(0, 120), randInt(0, 23)),
+        content: `<p>本托管服务面向社区${scene}，由属地物业${c.property_name}统一招募并管理的专业照护团队提供。</p><p>服务内容：${priceDesc}，并按需提供健康建档、用药提醒、紧急联络等增值项目。</p><p>适用人群广泛，既可满足双职工家庭的日间看护需求，也能为术后或年长居民提供有温度的陪伴式照护。</p>`
     }
 })
 

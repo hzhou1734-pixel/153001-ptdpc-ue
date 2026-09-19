@@ -11,13 +11,18 @@
                         @keyup.enter="resetPage"
                     />
                 </el-form-item>
-                <el-form-item class="w-[200px]" label="托管类型">
-                    <el-select v-model="queryParams.type" placeholder="全部" clearable>
+                <el-form-item class="w-[220px]" label="物业公司">
+                    <el-select
+                        v-model="queryParams.property_name"
+                        placeholder="全部"
+                        clearable
+                        filterable
+                    >
                         <el-option
-                            v-for="item in typeOptions"
-                            :key="item"
-                            :label="item"
-                            :value="item"
+                            v-for="item in propertyOptions"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.name"
                         />
                     </el-select>
                 </el-form-item>
@@ -52,6 +57,7 @@
         <el-card class="!border-none mt-4" shadow="never">
             <el-table size="large" v-loading="pager.loading" :data="pager.lists">
                 <el-table-column label="托管服务标题" prop="title" min-width="240" show-overflow-tooltip />
+                <el-table-column label="所属物业" prop="property_name" min-width="180" show-overflow-tooltip />
                 <el-table-column label="半天价格" min-width="120">
                     <template #default="{ row }">¥{{ row.half_price }}</template>
                 </el-table-column>
@@ -98,8 +104,8 @@
                     <span>{{ detail.title || '-' }}</span>
                 </div>
                 <div class="detail__item">
-                    <span class="detail__label">托管类型：</span>
-                    <span>{{ detail.type || '-' }}</span>
+                    <span class="detail__label">所属物业：</span>
+                    <span>{{ detail.property_name || '-' }}</span>
                 </div>
                 <div class="detail__item">
                     <span class="detail__label">状态：</span>
@@ -121,6 +127,10 @@
                     <span class="detail__label">添加时间：</span>
                     <span>{{ detail.create_time || '-' }}</span>
                 </div>
+                <div class="detail__item detail__item--full">
+                    <span class="detail__label">详情介绍：</span>
+                    <span class="detail__content" v-html="detail.content"></span>
+                </div>
             </div>
         </popup>
     </div>
@@ -128,6 +138,7 @@
 
 <script lang="ts" setup name="ghjServiceBoarding">
 import { boardingStatus, getBoardingList } from '@/api/ghj/content'
+import { getPropertyOptions } from '@/api/ghj/property'
 import Popup from '@/components/popup/index.vue'
 import { ElMessage } from 'element-plus'
 
@@ -135,7 +146,7 @@ import { usePaging } from '@/hooks/usePaging'
 
 const queryParams = reactive({
     title: '',
-    type: '',
+    property_name: '',
     status: '',
     start_time: '',
     end_time: ''
@@ -146,8 +157,8 @@ const { pager, getLists, resetPage, resetParams } = usePaging({
     params: queryParams
 })
 
-// 托管类型 / 状态下拉
-const typeOptions = ['老人日间托管', '暑期儿童托管', '术后康复陪护']
+// 物业公司 / 状态下拉
+const propertyOptions = ref<any[]>([])
 const statusOptions = ['显示中', '已下架']
 
 // ------------------------------------------------ 服务详情
@@ -171,6 +182,9 @@ onActivated(() => {
 })
 
 getLists()
+getPropertyOptions().then((res: any) => {
+    propertyOptions.value = res
+})
 </script>
 
 <style scoped lang="scss">
@@ -190,6 +204,15 @@ getLists()
     }
     &__label {
         color: #909399;
+    }
+    &__content {
+        display: block;
+        margin-top: 4px;
+        line-height: 22px;
+        color: #606266;
+        :deep(p) {
+            margin: 0 0 6px;
+        }
     }
 }
 </style>
