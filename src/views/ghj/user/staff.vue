@@ -70,11 +70,14 @@
                 <el-table-column label="昵称" prop="nickname" min-width="120" show-overflow-tooltip />
                 <el-table-column label="手机号码" prop="mobile" min-width="130" />
                 <el-table-column label="所属小区" prop="community_name" min-width="160" show-overflow-tooltip />
-                <el-table-column label="账号状态" min-width="100">
+                <el-table-column label="账号状态" min-width="110">
                     <template #default="{ row }">
-                        <el-tag :type="row.status == 1 ? 'success' : 'danger'">
-                            {{ row.status == 1 ? '启用' : '禁用' }}
-                        </el-tag>
+                        <el-switch
+                            v-model="row.status"
+                            :active-value="1"
+                            :inactive-value="0"
+                            @change="handleStatusChange(row)"
+                        />
                     </template>
                 </el-table-column>
                 <el-table-column label="添加时间" prop="create_time" min-width="170" />
@@ -139,8 +142,10 @@
 </template>
 
 <script lang="ts" setup name="ghjUserStaff">
-import { getStaffDetail, getStaffList } from '@/api/ghj/user'
+import { getStaffDetail, getStaffList, staffStatus } from '@/api/ghj/user'
 import { getPropertyOptions } from '@/api/ghj/property'
+
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 import { usePaging } from '@/hooks/usePaging'
 
@@ -173,6 +178,23 @@ const handleDetail = async (row: any) => {
     detail.value = {}
     detailRef.value?.open()
     detail.value = await getStaffDetail({ id: row.id })
+}
+
+// ------------------------------------------------ 账号状态启用/禁用
+const handleStatusChange = async (row: any) => {
+    const newStatus = row.status
+    const oldStatus = newStatus == 1 ? 0 : 1
+    try {
+        await ElMessageBox.confirm(
+            `确定要${newStatus == 1 ? '启用' : '禁用'}该员工账号吗？`,
+            '提示',
+            { type: 'warning' }
+        )
+        await staffStatus({ id: row.id, status: newStatus })
+        ElMessage.success('操作成功')
+    } catch {
+        row.status = oldStatus // 取消则回滚开关
+    }
 }
 
 onActivated(() => {

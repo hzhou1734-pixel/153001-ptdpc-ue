@@ -58,3 +58,9 @@ export function getStaffList(params: Record<string, any>) {
 export function getStaffDetail(params: { id: any }) {
     return delay(staffDb.find((i) => String(i.id) === String(params.id)) || {})
 }
+
+export function staffStatus(params: { id: any; status: any }) {
+    const item = staffDb.find((i) => String(i.id) === String(params.id))
+    if (item) item.status = params.status
+    return delay({}, 200)
+}
