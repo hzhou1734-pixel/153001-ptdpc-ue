@@ -80,7 +80,7 @@
                 <el-table-column label="添加时间" prop="create_time" min-width="170" />
                 <el-table-column label="操作" width="120" fixed="right">
                     <template #default="{ row }">
-                        <el-button type="primary" link @click="handleDetail(row)">员工详情</el-button>
+                        <el-button type="primary" link @click="handleDetail(row)">详情</el-button>
                     </template>
                 </el-table-column>
                 <template #empty>
