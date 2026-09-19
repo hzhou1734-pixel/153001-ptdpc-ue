@@ -200,6 +200,7 @@ export function boardingStatus(params: { id: any; status: string }) {
 export function getEscortList(params: Record<string, any>) {
     const list = paginate(escortDb, params, {
         title: (item, v) => item.title.includes(v),
+        property_name: (item, v) => item.property_name.includes(v),
         status: (item, v) => item.status === v,
         start_time: (item, v) => inRange(item.create_time, v, params.end_time)
     })
@@ -216,6 +217,7 @@ export function escortStatus(params: { id: any; status: string }) {
 export function getHelperList(params: Record<string, any>) {
     const list = paginate(helperDb, params, {
         title: (item, v) => item.title.includes(v),
+        property_name: (item, v) => item.property_name.includes(v),
         status: (item, v) => item.status === v,
         start_time: (item, v) => inRange(item.create_time, v, params.end_time)
     })

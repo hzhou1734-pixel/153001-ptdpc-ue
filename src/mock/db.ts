@@ -548,11 +548,19 @@ export const boardingDb = makeList(28, (i) => {
 
 // ---------------------------------------------------------------- 运营管理：陪诊服务（物业后台添加，平台仅查看 + 显示/下架）
 export const escortDb = makeList(24, (i) => {
-    const title = pick(['上门陪诊服务', '陪同就医全程服务', '健康监测手环绑定'])
+    const c = pick(communityDb)
+    const desc = pick([
+        '含院内全程陪诊、挂号取药与报告代取',
+        '提供就诊规划、陪同检查与用药提醒',
+        '适配长者及行动不便人群的专车接送陪诊'
+    ])
     return {
         id: 220001 + i,
-        title,
+        image: SERVICE_IMGS[i % SERVICE_IMGS.length],
+        title: pick(['上门陪诊服务', '陪同就医全程服务', '健康监测手环绑定']),
+        property_name: c.property_name,
         price: randInt(50, 380),
+        content: `<p>本陪诊服务由属地物业${c.property_name}合作的持证陪诊员提供，覆盖${desc}。</p><p>服务流程：提前预约—资料核对—全程陪同—就诊小结反馈，确保就诊过程安全、顺畅、有人照应。</p><p>面向独居老人、孕产期女性、异地就医居民等需要协助的人群，可灵活选择半日或全天陪诊。</p>`,
         status: pick(['显示中', '已下架']),
         sort: randInt(0, 100),
         create_time: ago(randInt(0, 120), randInt(0, 23))
@@ -561,13 +569,21 @@ export const escortDb = makeList(24, (i) => {
 
 // ---------------------------------------------------------------- 运营管理：生活帮手（物业后台添加，平台仅查看 + 显示/隐藏）
 export const helperDb = makeList(30, (i) => {
+    const c = pick(communityDb)
+    const desc = pick([
+        '提供上门保洁、收纳整理与家电基础养护',
+        '涵盖水电小修、家具安装与应急维修',
+        '支持代买代办、取送件与跑腿服务'
+    ])
     const title = pick(['家政保洁收纳', '家电维修安装', '代买代办跑腿'])
     return {
         id: 230001 + i,
         image: SERVICE_IMGS[i % SERVICE_IMGS.length],
         title,
+        property_name: c.property_name,
         price: randInt(20, 320),
         sales: randInt(0, 5000),
+        content: `<p>本生活帮手服务由属地物业${c.property_name}认证的服务人员提供，覆盖${desc}。</p><p>服务说明：明码标价、持证上门、服务后可评价，保障社区居民的日常便利与生活品质。</p>`,
         status: pick(['显示', '隐藏']),
         sort: randInt(0, 100),
         create_time: ago(randInt(0, 120), randInt(0, 23))
