@@ -26,10 +26,15 @@ export function getBusiness(params?: Record<string, any>) {
         count: lists.length,
         lists,
         extend: {
+            // 订单总数 / 取消订单数 含全部业务；交易总额 / 有效金额 仅含平台收费业务（生活服务帮手不计入）
             total_order: lists.reduce((s, i) => s + i.order_total, 0),
-            total_amount: Number(lists.reduce((s, i) => s + i.amount_total, 0).toFixed(2)),
+            total_amount: Number(
+                lists.filter((i) => !i.feeFree).reduce((s, i) => s + i.amount_total, 0).toFixed(2)
+            ),
             total_cancel: lists.reduce((s, i) => s + i.cancel_total, 0),
-            total_valid: Number(lists.reduce((s, i) => s + i.valid_amount, 0).toFixed(2))
+            total_valid: Number(
+                lists.filter((i) => !i.feeFree).reduce((s, i) => s + i.valid_amount, 0).toFixed(2)
+            )
         }
     })
 }

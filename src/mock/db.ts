@@ -511,7 +511,9 @@ export const overviewDb = statBase
 export const businessDb = [
     { type: '陪诊业务', order_total: 12860, amount_total: 3864200.0, cancel_total: 860, valid_amount: 3682400.0 },
     { type: '托管业务', order_total: 9640, amount_total: 2860400.0, cancel_total: 420, valid_amount: 2760200.0 },
-    { type: '膳食业务', order_total: 24860, amount_total: 1860400.0, cancel_total: 1240, valid_amount: 1680200.0 }
+    { type: '膳食业务', order_total: 24860, amount_total: 1860400.0, cancel_total: 1240, valid_amount: 1680200.0 },
+    // 生活服务帮手：平台不收取费用，订单金额仅为展示，不计入交易额与结算额
+    { type: '生活服务帮手', order_total: 18520, amount_total: 2548600.0, cancel_total: 920, valid_amount: 0, feeFree: true }
 ]
 
 // ---------------------------------------------------------------- 工具函数
