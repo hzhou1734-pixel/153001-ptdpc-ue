@@ -155,26 +155,6 @@
                                 class="cert-preview"
                             />
                         </div>
-                        <div class="detail__item">
-                            <span class="detail__label">认证角色：</span>
-                            <span>{{ detail.role || '-' }}</span>
-                        </div>
-                        <div class="detail__item">
-                            <span class="detail__label">持证类型：</span>
-                            <span>{{ detail.cert_type || '-' }}</span>
-                        </div>
-                        <div class="detail__item">
-                            <span class="detail__label">证书编号：</span>
-                            <span class="font-mono">{{ detail.cert_no || '-' }}</span>
-                        </div>
-                        <div class="detail__item">
-                            <span class="detail__label">所属社区：</span>
-                            <span>{{ detail.community_name || '-' }}</span>
-                        </div>
-                        <div class="detail__item">
-                            <span class="detail__label">从业年限：</span>
-                            <span>{{ detail.experience_years ?? '-' }} 年</span>
-                        </div>
                         <div class="detail__item detail__item--full">
                             <span class="detail__label">认证描述：</span>
                             <span>{{ detail.desc || '-' }}</span>
@@ -364,10 +344,6 @@ getLists()
     border: 1px solid #eef0f3;
     background: #fafbfc;
     overflow: hidden;
-}
-.font-mono {
-    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-    letter-spacing: 0.3px;
 }
 
 .order-toolbar {
