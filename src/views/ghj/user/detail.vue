@@ -218,18 +218,11 @@
                 <el-tab-pane label="健康手环" name="band">
                     <el-table class="mt-4" size="large" :data="detail.band">
                         <el-table-column label="手环SN" prop="sn" min-width="160" />
-                        <el-table-column label="心率" min-width="100">
-                            <template #default="{ row }">
-                                {{ row.heart_rate ?? '-' }}
+                        <el-table-column label="手机号码" min-width="140">
+                            <template #default>
+                                {{ detail.base?.mobile || '-' }}
                             </template>
                         </el-table-column>
-                        <el-table-column label="血氧" min-width="100">
-                            <template #default="{ row }">
-                                {{ row.blood_oxygen ?? '-' }}
-                            </template>
-                        </el-table-column>
-                        <el-table-column label="步数" prop="step" min-width="100" />
-                        <el-table-column label="睡眠" prop="sleep" min-width="120" />
                         <el-table-column label="绑定时间" prop="bind_time" min-width="170" />
                         <template #empty>
                             <el-empty description="暂无手环数据" />
