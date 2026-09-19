@@ -66,6 +66,9 @@ function makeList<T>(count: number, factory: (i: number) => T): T[] {
     return Array.from({ length: count }, (_, i) => factory(i))
 }
 
+// 小区名称预生成：物业与小区共用同一数组，保证「物业列表-小区名称」与「小区信息」名称完全一致
+const communityNames = makeList(68, () => `${pick(communityPrefix)}${pick(communityWords)}`)
+
 // ---------------------------------------------------------------- 物业
 export const propertyDb = makeList(68, (i) => {
     const name = `${pick(surnames)}${pick(given1)}${pick(propertySuffix)}`
@@ -74,6 +77,7 @@ export const propertyDb = makeList(68, (i) => {
     return {
         id: 10001 + i,
         community_id: 20001 + i,
+        community_name: communityNames[i],
         name,
         contact: `${pick(surnames)}${pick(given1)}`,
         mobile: `1${pick(['3', '5', '7', '8', '9'])}${String(randInt(100000000, 999999999)).slice(0, 9)}`,
@@ -96,7 +100,7 @@ export const communityDb = propertyDb.map((p, i) => {
     const totalHouse = randInt(200, 3000)
     return {
         id: 20001 + i,
-        name: `${pick(communityPrefix)}${pick(communityWords)}`,
+        name: communityNames[i],
         property_id: p.id,
         property_name: p.name,
         province: '湖南省',

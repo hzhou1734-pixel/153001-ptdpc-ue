@@ -121,7 +121,7 @@
                 <el-table-column label="公司名称" prop="name" min-width="180" show-overflow-tooltip />
                 <el-table-column label="联系人姓名" prop="contact" min-width="120" />
                 <el-table-column label="手机号" prop="mobile" min-width="120" />
-                <el-table-column label="管理小区总数" prop="community_count" min-width="120" />
+                <el-table-column label="小区名称" prop="community_name" min-width="160" show-overflow-tooltip />
                 <el-table-column label="用户总数" prop="user_count" min-width="110" />
                 <el-table-column label="总订单数" prop="order_count" min-width="110" />
                 <el-table-column label="累计交易额" min-width="140">
