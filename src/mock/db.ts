@@ -452,6 +452,8 @@ export const activityDb = makeList(28, (i) => {
         property_name: c.property_name,
         join_count: Math.floor(limit * rand()),
         limit_count: limit,
+        activity_time: ago(-randInt(10, 60), 9),
+        signup_deadline: ago(-randInt(2, 9), 18),
         create_time: ago(randInt(1, 120)),
         content: `活动详情内容示例（#${i + 1}）：活动时间、地点及注意事项详见正文，名额有限，报满即止。`
     }

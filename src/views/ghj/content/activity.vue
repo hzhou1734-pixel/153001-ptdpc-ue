@@ -87,6 +87,14 @@
                     <span class="detail__label">详情内容：</span>
                     <span>{{ detail.content || '-' }}</span>
                 </div>
+                <div class="detail__item">
+                    <span class="detail__label">活动时间：</span>
+                    <span class="detail__time">{{ detail.activity_time || '-' }}</span>
+                </div>
+                <div class="detail__item">
+                    <span class="detail__label">报名截止时间：</span>
+                    <span class="detail__time">{{ detail.signup_deadline || '-' }}</span>
+                </div>
                 <div class="detail__item detail__item--full">
                     <span class="detail__label">创建时间：</span>
                     <span>{{ detail.create_time || '-' }}</span>
@@ -187,6 +195,11 @@ getLists()
     }
     &__label {
         color: #909399;
+    }
+    &__time {
+        color: #1c7ed6;
+        font-weight: 600;
+        letter-spacing: 0.3px;
     }
 }
 </style>
