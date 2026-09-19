@@ -118,6 +118,30 @@ export const communityDb = propertyDb.map((p, i) => {
     }
 })
 
+// 小区：订单信息（按 communityId 确定性生成；托管 / 膳食 / 陪诊 / 生活帮手 四类）
+const COMMUNITY_ORDER_TYPES = ['托管', '膳食', '陪诊', '生活帮手']
+const COMMUNITY_ORDER_TITLE_MAP: Record<string, string[]> = {
+    托管: ['老人日间托管', '暑期儿童托管', '术后康复陪护'],
+    膳食: ['社区营养膳食配送', '老年助餐配送', '慢病调理餐配送'],
+    陪诊: ['上门陪诊服务', '陪同就医全程服务', '健康监测手环绑定'],
+    生活帮手: ['家政保洁收纳', '家电维修安装', '代买代办跑腿']
+}
+export const communityOrderDb = (communityId: number) => {
+    const r = makeRand(`community-order-${communityId}`)
+    return makeList(randInt(6, 18, r), (i) => {
+        const type = pick(COMMUNITY_ORDER_TYPES, r)
+        return {
+            id: 400001 + i,
+            order_sn: `NO${communityId}${String(randInt(100000, 999999, r))}`,
+            title: pick(COMMUNITY_ORDER_TITLE_MAP[type], r),
+            type,
+            amount: randInt(1000, 200000, r) / 100,
+            create_time: ago(randInt(0, 120, r)),
+            status: pick(['待服务', '服务中', '已完成', '已取消'], r)
+        }
+    })
+}
+
 // ---------------------------------------------------------------- 用户
 export const userDb = makeList(260, (i) => {
     const nickname = `${pick(surnames)}${pick(given1)}`

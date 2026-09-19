@@ -1,4 +1,4 @@
-import { communityDb, delay, inRange, nextId, paginate, propertyDb } from '@/mock/db'
+import { communityDb, communityOrderDb, delay, inRange, nextId, paginate, propertyDb } from '@/mock/db'
 
 // ---------------------------------------------------------------- 物业
 export function getPropertyList(params: Record<string, any>) {
@@ -61,6 +61,11 @@ export function getCommunityList(params: Record<string, any>) {
 
 export function getCommunityDetail(params: { id: any }) {
     return delay(communityDb.find((i) => String(i.id) === String(params.id)) || {})
+}
+
+// 小区订单：按 community_id 返回该小区下 托管 / 膳食 / 陪诊 / 生活帮手 四类订单
+export function getCommunityOrderList(params: { community_id: any }) {
+    return delay(communityOrderDb(Number(params.community_id)))
 }
 
 // 省市区级联选项：province -> city -> district
