@@ -58,11 +58,17 @@
                 </el-table-column>
                 <el-table-column label="内容标题" prop="title" min-width="240" show-overflow-tooltip />
                 <el-table-column label="所属物业" prop="property_name" min-width="180" show-overflow-tooltip />
-                <el-table-column label="状态" min-width="110">
+                <el-table-column label="状态" min-width="130">
                     <template #default="{ row }">
-                        <el-tag :type="row.status === '显示中' ? 'success' : 'info'">
-                            {{ row.status }}
-                        </el-tag>
+                        <el-switch
+                            v-model="row.status"
+                            inline-prompt
+                            active-value="显示中"
+                            inactive-value="已下架"
+                            active-text="显示"
+                            inactive-text="下架"
+                            @change="(val) => handleStatus(row, String(val))"
+                        />
                     </template>
                 </el-table-column>
                 <el-table-column label="发布时间" prop="publish_time" min-width="170" />
@@ -112,9 +118,10 @@
 </template>
 
 <script lang="ts" setup name="ghjContentWonderful">
-import { getWonderfulDetail, getWonderfulList } from '@/api/ghj/content'
+import { getWonderfulDetail, getWonderfulList, wonderfulStatus } from '@/api/ghj/content'
 import { getPropertyOptions } from '@/api/ghj/property'
 import Popup from '@/components/popup/index.vue'
+import { ElMessage } from 'element-plus'
 
 import { usePaging } from '@/hooks/usePaging'
 
@@ -148,6 +155,12 @@ const handleDetail = async (row: any) => {
     detail.value = {}
     detailRef.value?.open()
     detail.value = await getWonderfulDetail({ id: row.id })
+}
+
+// 状态开关：显示 / 下架
+const handleStatus = async (row: any, status: string) => {
+    await wonderfulStatus({ id: row.id, status })
+    ElMessage.success(status === '显示中' ? '内容已显示' : '内容已下架')
 }
 
 onActivated(() => {

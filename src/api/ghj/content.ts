@@ -168,3 +168,10 @@ export function getWonderfulList(params: Record<string, any>) {
 export function getWonderfulDetail(params: { id: any }) {
     return delay(wonderfulDb.find((i) => String(i.id) === String(params.id)) || {})
 }
+
+// 精彩内容状态开关：显示 / 下架，写入 wonderfulDb
+export function wonderfulStatus(params: { id: any; status: string }) {
+    const item = wonderfulDb.find((i) => String(i.id) === String(params.id))
+    if (item) item.status = params.status
+    return delay({}, 200)
+}
