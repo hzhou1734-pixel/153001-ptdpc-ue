@@ -8,7 +8,7 @@
                 服务人员技能认证审核
             </div>
             <div class="hr-header__desc">
-                社区服务提供者提交资质认证，平台按服务类目核验持证类型与凭证材料，审核通过后纳入人才库接单。
+                社区服务提供者提交资质认证，平台核验持证类型与凭证材料，审核通过后纳入人才库接单。
             </div>
         </div>
 
@@ -27,16 +27,6 @@
 
         <el-card class="!border-none mt-4" shadow="never">
             <el-form class="mb-[-16px]" :model="queryParams" :inline="true">
-                <el-form-item class="w-[200px]" label="服务类目">
-                    <el-select v-model="queryParams.category" placeholder="全部" clearable>
-                        <el-option
-                            v-for="item in categoryOptions"
-                            :key="item"
-                            :label="item"
-                            :value="item"
-                        />
-                    </el-select>
-                </el-form-item>
                 <el-form-item class="w-[200px]" label="认证角色">
                     <el-input
                         v-model="queryParams.skill_title"
@@ -103,18 +93,6 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="服务类目" min-width="110">
-                    <template #default="{ row }">
-                        <span
-                            class="cat-tag"
-                            :style="{
-                                color: categoryMeta[row.category]?.color,
-                                background: categoryMeta[row.category]?.bg
-                            }"
-                            >{{ row.category }}</span
-                        >
-                    </template>
-                </el-table-column>
                 <el-table-column
                     label="认证角色"
                     prop="role"
@@ -161,15 +139,12 @@
             :cancel-button-text="'关闭'"
         >
             <div v-if="detail.id" class="hr-detail">
-                <div
-                    class="hr-detail__head"
-                    :style="{ background: categoryMeta[detail.category]?.bg }"
-                >
+                <div class="hr-detail__head">
                     <el-avatar :src="detail.avatar" :size="56" />
                     <div class="hr-detail__head-info">
                         <div class="hr-detail__name">{{ detail.nickname }}</div>
                         <div class="hr-detail__sub">
-                            {{ detail.category }} · {{ detail.role }}
+                            {{ detail.role }}
                         </div>
                     </div>
                     <el-tag
@@ -205,17 +180,6 @@
                 <div class="hr-detail__section">
                     <div class="hr-detail__section-title">认证信息</div>
                     <div class="hr-detail__grid">
-                        <div class="hr-detail__item">
-                            <span class="hr-detail__label">服务类目</span>
-                            <span
-                                class="cat-tag"
-                                :style="{
-                                    color: categoryMeta[detail.category]?.color,
-                                    background: categoryMeta[detail.category]?.bg
-                                }"
-                                >{{ detail.category || '-' }}</span
-                            >
-                        </div>
                         <div class="hr-detail__item">
                             <span class="hr-detail__label">认证角色</span>
                             <span>{{ detail.role || '-' }}</span>
@@ -277,18 +241,7 @@ import feedback from '@/utils/feedback'
 
 import { usePaging } from '@/hooks/usePaging'
 
-// 服务类目元数据（与人才库/小区订单业务线一致，配品牌色）
-const categoryMeta: Record<string, { color: string; bg: string }> = {
-    托管: { color: '#0CA678', bg: '#E6F8F2' },
-    膳食: { color: '#F76707', bg: '#FFF1E6' },
-    陪诊: { color: '#1C7ED6', bg: '#E7F1FB' },
-    生活帮手: { color: '#E8590C', bg: '#FFF0E8' },
-    康复: { color: '#7048E8', bg: '#F0EBFD' },
-    家政: { color: '#2F9E44', bg: '#E9F7EC' }
-}
-
 const queryParams = reactive({
-    category: '',
     skill_title: '',
     nickname: '',
     mobile: '',
@@ -302,7 +255,6 @@ const { pager, getLists, resetPage, resetParams } = usePaging({
     params: queryParams
 })
 
-const categoryOptions = ['托管', '膳食', '陪诊', '生活帮手', '康复', '家政']
 const auditStatusOptions = ['待审核', '已通过', '已驳回']
 
 const getAuditStatusType = (status: any) => {
@@ -416,15 +368,6 @@ getStats()
     }
 }
 
-.cat-tag {
-    display: inline-flex;
-    align-items: center;
-    padding: 2px 10px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    line-height: 20px;
-}
 .cert-tag {
     display: inline-flex;
     align-items: center;
@@ -452,6 +395,7 @@ getStats()
         padding: 16px 18px;
         border-radius: 12px;
         margin-bottom: 4px;
+        background: #e9f7f1;
     }
     &__head-info {
         flex: 1;
