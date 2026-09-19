@@ -19,11 +19,33 @@ export function getHrList(params: Record<string, any>) {
         skill_title: (item, v) => item.skill_title.includes(v),
         nickname: (item, v) => item.nickname.includes(v),
         mobile: (item, v) => item.mobile.includes(v),
+        category: (item, v) => item.category === v,
         audit_status: (item, v) => item.audit_status === v,
         start_time: (item, v) => inRange(item.submit_time, v, params.end_time),
         audit_start: (item, v) => inRange(item.audit_time, v, params.audit_end)
     })
     return delay(list)
+}
+
+// 审核状态统计：待审核 / 已通过 / 已驳回 / 总认证数
+export function getHrStats() {
+    const stat = { pending: 0, passed: 0, rejected: 0, total: hrDb.length }
+    hrDb.forEach((i: any) => {
+        if (i.audit_status === '待审核') stat.pending++
+        else if (i.audit_status === '已通过') stat.passed++
+        else if (i.audit_status === '已驳回') stat.rejected++
+    })
+    return delay({ ...stat })
+}
+
+// 审核操作：通过 / 驳回，写入 hrDb 审核状态
+export function hrAudit(params: { id: any; audit_status: string }) {
+    const item: any = hrDb.find((i) => String(i.id) === String(params.id))
+    if (item) {
+        item.audit_status = params.audit_status
+        item.audit_time = new Date().toLocaleString('zh-CN', { hour12: false })
+    }
+    return delay({}, 200)
 }
 
 export function getHrDetail(params: { id: any }) {

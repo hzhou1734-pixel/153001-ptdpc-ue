@@ -60,6 +60,13 @@ const RESOURCE_IMGS = makeList(7, (i) => `${import.meta.env.BASE_URL}mock-img/re
 const ACTIVITY_IMGS = makeList(7, (i) => `${import.meta.env.BASE_URL}mock-img/activity/${i}.svg`)
 const WONDERFUL_IMGS = makeList(5, (i) => `${import.meta.env.BASE_URL}mock-img/wonderful/${i}.svg`)
 const AVATAR_IMGS = makeList(8, (i) => `${import.meta.env.BASE_URL}mock-img/avatar/${i}.svg`)
+// 人力资源：按持证类型区分的认证凭证图（职业资格证书 / 培训结业证 / 健康证 / 身份证明）
+const HR_IMGS: Record<string, string> = {
+    职业资格证书: `${import.meta.env.BASE_URL}mock-img/hr/zyg.svg`,
+    培训结业证: `${import.meta.env.BASE_URL}mock-img/hr/jy.svg`,
+    健康证: `${import.meta.env.BASE_URL}mock-img/hr/jk.svg`,
+    身份证明: `${import.meta.env.BASE_URL}mock-img/hr/sf.svg`
+}
 
 /** 生成列表数据 */
 function makeList<T>(count: number, factory: (i: number) => T): T[] {
@@ -262,27 +269,50 @@ export const staffDb = makeList(96, (i) => {
     }
 })
 
-// ---------------------------------------------------------------- 内容：人力资源（用户提交的技能认证）
+// ---------------------------------------------------------------- 内容：人力资源（服务人员技能认证审核）
+// 业务场景：社区服务人员按服务类目提交资质认证，平台审核持证类型与凭证后纳入人才库
+export const HR_CATEGORIES = ['托管', '膳食', '陪诊', '生活帮手', '康复', '家政']
+export const HR_CERT_TYPES = ['职业资格证书', '培训结业证', '健康证', '身份证明']
+// 各服务类目对应的真实服务角色
+const HR_ROLE_BY_CATEGORY: Record<string, string[]> = {
+    托管: ['老人日间托管师', '暑期儿童托管师', '育儿早教师', '认知症陪伴员'],
+    膳食: ['社区营养师', '老年助餐配送员', '慢病调理膳食师', '月子餐营养师'],
+    陪诊: ['陪诊就医专员', '健康监测管理师', '康复陪练师', '用药提醒员'],
+    生活帮手: ['家政保洁收纳师', '家电维修安装工', '代买代办跑腿员', '适老化改造师'],
+    康复: ['康复理疗师', '中医推拿师', '运动康复指导员', '言语治疗师'],
+    家政: ['母婴护理月嫂', '居家整理收纳师', '家电清洗技师', '宠物照料员']
+}
 export const hrDb = makeList(72, (i) => {
     const u = pick(userDb)
+    const category = pick(HR_CATEGORIES)
+    const certType = pick(HR_CERT_TYPES)
+    const role = pick(HR_ROLE_BY_CATEGORY[category])
+    const certNoPrefix: Record<string, string> = {
+        职业资格证书: 'ZY',
+        培训结业证: 'JY',
+        健康证: 'JK',
+        身份证明: 'SF'
+    }
     return {
         id: 90001 + i,
-        skill_title: pick([
-            '居家养老陪护',
-            '母婴护理月嫂',
-            '专业陪诊就医',
-            '社区营养膳食',
-            '康复理疗推拿',
-            '家政保洁收纳',
-            '家电维修安装',
-            '老年健康管理'
-        ]),
+        category,
+        role,
+        cert_type: certType,
+        cert_no: `${certNoPrefix[certType]}2025-${String(randInt(1000, 9999)).padStart(4, '0')}-${String(
+            randInt(100, 9999)
+        ).padStart(4, '0')}`,
+        skill_title: role,
         avatar: AVATAR_IMGS[(i + 1) % AVATAR_IMGS.length],
         nickname: u.nickname,
         mobile: u.mobile,
-        credential: RESOURCE_IMGS[i % RESOURCE_IMGS.length],
-        skill: pick(['居家养老陪护', '母婴护理月嫂', '专业陪诊就医', '社区营养膳食', '康复理疗推拿']),
-        desc: `认证详情示例（#${i + 1}）：本人具备相关服务资质与${randInt(1, 10)}年实操经验，可接受平台派单，服务区域为所在社区周边。`,
+        community_name: u.community_name,
+        credential: HR_IMGS[certType],
+        skill: role,
+        experience_years: randInt(1, 12),
+        desc: `认证详情（#${i + 1}）：本人持有${certType}，具备${role}相关服务资质，拥有${randInt(
+            1,
+            12
+        )}年社区实操经验，可接受平台派单，服务区域为所在社区周边。`,
         audit_status: pick(['待审核', '已通过', '已驳回']),
         submit_time: ago(randInt(0, 60)),
         audit_time: ago(randInt(0, 50))

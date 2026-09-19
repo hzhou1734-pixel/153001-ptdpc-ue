@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 280">
+  <defs>
+    <linearGradient id="zygHead" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4DABF7"/>
+      <stop offset="1" stop-color="#3B8EE0"/>
+    </linearGradient>
+  </defs>
+  <rect x="6" y="6" width="388" height="268" rx="12" fill="#ffffff" stroke="#E7ECF3" stroke-width="2"/>
+  <path d="M6 18 a12 12 0 0 1 12 -12 H382 a12 12 0 0 1 12 12 V58 H6 Z" fill="url(#zygHead)"/>
+  <text x="28" y="40" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="20" font-weight="700" fill="#ffffff">职业资格证书</text>
+  <text x="372" y="40" text-anchor="end" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#ffffff" opacity="0.85">人力资源和社会保障部监制</text>
+  <g>
+    <rect x="28" y="80" width="84" height="104" rx="8" fill="#EEF4FB" stroke="#D6E4F2" stroke-width="2"/>
+    <circle cx="70" cy="116" r="22" fill="#C7DBF2"/>
+    <path d="M44 178 C44 154 56 146 70 146 C84 146 96 154 96 178 Z" fill="#C7DBF2"/>
+  </g>
+  <text x="134" y="96" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="15" fill="#303133">持证人：顾好家服务师</text>
+  <text x="134" y="128" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" fill="#5A6573">职业工种：社区照护 / 家政服务</text>
+  <text x="134" y="158" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" fill="#5A6573">技能等级：五级 / 初级工</text>
+  <text x="134" y="188" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" fill="#5A6573">发证日期：2025-06-18</text>
+  <line x1="28" y1="210" x2="372" y2="210" stroke="#EEF1F5" stroke-width="2"/>
+  <text x="28" y="240" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" fill="#9097A3">证书编号：ZY2025-0731-0042</text>
+  <g transform="translate(320,150)">
+    <circle r="34" fill="none" stroke="#F03E3E" stroke-width="3" opacity="0.9"/>
+    <text x="0" y="-4" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="700" fill="#F03E3E">核验</text>
+    <text x="0" y="14" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="700" fill="#F03E3E">专用章</text>
+  </g>
+</svg>

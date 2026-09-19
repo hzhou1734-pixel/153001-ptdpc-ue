@@ -9,6 +9,7 @@
 ## 本地预览
 - 启动：`node node_modules/vite/bin/vite.js --host 0.0.0.0 --port 5173`（中文路径下 dev 模式可正常启动，但 optimizeDeps 预构建约 40s+ 才 ready，需耐心等待）。
 - 访问：http://localhost:5173
+- **协作约定（强约束）：每次修改代码后，必须用 present_files 在右侧内置浏览器预览面板打开 http://localhost:5173 核对效果**，确认 UI/交互无误再交付。dev server 未启动时先按上面命令拉起。
 - 注意：本机 `vite build` 在 index.html 阶段会因中文路径 + html-inline-proxy 失败（仅 2 模块转换即中断），与代码无关；EdgeOne 云端构建不受影响。类型检查用 `node node_modules/vue-tsc/bin/vue-tsc.js --noEmit`。
 
 ## Git 环境注意
