@@ -361,6 +361,14 @@ export const userTalentDb = (userId: number) => {
 // ---------------------------------------------------------------- 内容：人才库（通过认证的人才）
 export const talentDb = makeList(58, (i) => {
     const u = pick(userDb)
+    const category = pick(HR_CATEGORIES)
+    const certType = pick(HR_CERT_TYPES)
+    const certNoPrefix: Record<string, string> = {
+        职业资格证书: 'ZY',
+        培训结业证: 'JY',
+        健康证: 'JK',
+        身份证明: 'SF'
+    }
     const inProgress = randInt(0, 20)
     const completed = randInt(0, 120)
     const cancelled = randInt(0, 30)
@@ -370,7 +378,18 @@ export const talentDb = makeList(58, (i) => {
         nickname: u.nickname,
         mobile: u.mobile,
         skill: pick(['居家养老陪护', '母婴护理月嫂', '专业陪诊就医', '社区营养膳食', '康复理疗推拿', '家政保洁收纳']),
-        category: pick(['陪诊', '托管', '膳食', '康复', '家政']),
+        category,
+        role: pick(HR_ROLE_BY_CATEGORY[category]),
+        cert_type: certType,
+        cert_no: `${certNoPrefix[certType]}2025-${String(randInt(1000, 9999)).padStart(4, '0')}-${String(
+            randInt(100, 9999)
+        ).padStart(4, '0')}`,
+        community_name: pick(communityNames),
+        credential: HR_IMGS[certType],
+        experience_years: randInt(1, 12),
+        desc: `认证详情（#${i + 1}）：本人持有${certType}，具备${pick(
+            HR_ROLE_BY_CATEGORY[category]
+        )}相关服务资质，拥有${randInt(1, 12)}年社区实操经验，可接受平台派单，服务区域为所在社区周边。`,
         order_total: inProgress + completed + cancelled,
         in_progress: inProgress,
         completed: completed,
@@ -385,6 +404,7 @@ export const talentDb = makeList(58, (i) => {
 export const talentOrderDb = (talentId: number) =>
     makeList(randInt(3, 10), (i) => ({
         id: 210001 + i,
+        order_no: `GJ${randInt(100000000000, 999999999999)}`,
         cover: ACTIVITY_IMGS[i % ACTIVITY_IMGS.length],
         title: pick(['上门陪诊服务', '老人日间托管', '社区营养膳食配送', '康复理疗服务', '家政保洁服务']),
         amount: randInt(1000, 200000) / 100,

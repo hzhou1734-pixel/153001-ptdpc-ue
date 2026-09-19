@@ -88,14 +88,12 @@
                         <span>¥{{ row.finish_amount?.toFixed(2) ?? '0.00' }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="人才状态" min-width="110">
+                <el-table-column label="人才状态" min-width="90">
                     <template #default="{ row }">
                         <el-switch
                             v-model="row.talent_status"
                             :active-value="1"
                             :inactive-value="0"
-                            active-text="启用"
-                            inactive-text="禁用"
                             @change="handleStatusChange(row)"
                         />
                     </template>
@@ -145,6 +143,44 @@
                         </div>
                     </div>
                 </el-tab-pane>
+                <el-tab-pane label="认证资料" name="cert">
+                    <div class="detail">
+                        <div class="detail__item detail__item--full">
+                            <span class="detail__label">认证凭证：</span>
+                            <image-contain
+                                :src="detail.credential"
+                                :width="200"
+                                :height="130"
+                                fit="contain"
+                                class="cert-preview"
+                            />
+                        </div>
+                        <div class="detail__item">
+                            <span class="detail__label">认证角色：</span>
+                            <span>{{ detail.role || '-' }}</span>
+                        </div>
+                        <div class="detail__item">
+                            <span class="detail__label">持证类型：</span>
+                            <span>{{ detail.cert_type || '-' }}</span>
+                        </div>
+                        <div class="detail__item">
+                            <span class="detail__label">证书编号：</span>
+                            <span class="font-mono">{{ detail.cert_no || '-' }}</span>
+                        </div>
+                        <div class="detail__item">
+                            <span class="detail__label">所属社区：</span>
+                            <span>{{ detail.community_name || '-' }}</span>
+                        </div>
+                        <div class="detail__item">
+                            <span class="detail__label">从业年限：</span>
+                            <span>{{ detail.experience_years ?? '-' }} 年</span>
+                        </div>
+                        <div class="detail__item detail__item--full">
+                            <span class="detail__label">认证描述：</span>
+                            <span>{{ detail.desc || '-' }}</span>
+                        </div>
+                    </div>
+                </el-tab-pane>
                 <el-tab-pane label="订单信息" name="order">
                     <div class="stat-row">
                         <div class="stat-item">
@@ -170,7 +206,16 @@
                             >
                         </div>
                     </div>
-                    <el-table size="small" :data="detail.orders || []" class="mt-4">
+                    <div class="order-toolbar">
+                        <el-input
+                            v-model="orderKeyword"
+                            placeholder="搜索订单编号 / 标题 / 下单用户"
+                            clearable
+                            class="order-search"
+                        />
+                    </div>
+                    <el-table size="small" :data="filteredOrders" class="mt-4">
+                        <el-table-column label="订单编号" prop="order_no" min-width="180" />
                         <el-table-column label="服务封面图" width="90">
                             <template #default="{ row }">
                                 <image-contain :src="row.cover" :width="50" :height="50" fit="cover" />
@@ -240,9 +285,24 @@ const detailRef = shallowRef<InstanceType<typeof Popup>>()
 const detail = ref<any>({})
 const activeTab = ref('base')
 
+// 订单信息：本地搜索（订单编号 / 标题 / 下单用户）
+const orderKeyword = ref('')
+const filteredOrders = computed(() => {
+    const kw = orderKeyword.value.trim()
+    const orders = detail.value.orders || []
+    if (!kw) return orders
+    return orders.filter(
+        (o: any) =>
+            (o.order_no || '').includes(kw) ||
+            (o.title || '').includes(kw) ||
+            (o.user || '').includes(kw)
+    )
+})
+
 const handleDetail = async (row: any) => {
     detail.value = {}
     activeTab.value = 'base'
+    orderKeyword.value = ''
     detailRef.value?.open()
     detail.value = await getTalentDetail({ id: row.id })
 }
@@ -297,5 +357,26 @@ getLists()
     font-size: 18px;
     font-weight: 600;
     color: #303133;
+}
+
+.cert-preview {
+    border-radius: 8px;
+    border: 1px solid #eef0f3;
+    background: #fafbfc;
+    overflow: hidden;
+}
+.font-mono {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    letter-spacing: 0.3px;
+}
+
+.order-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 12px;
+}
+.order-search {
+    width: 280px;
+    max-width: 100%;
 }
 </style>
