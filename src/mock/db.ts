@@ -73,6 +73,7 @@ export const propertyDb = makeList(68, (i) => {
     const hasExpire = rand() > 0.5
     return {
         id: 10001 + i,
+        community_id: 20001 + i,
         name,
         contact: `${pick(surnames)}${pick(given1)}`,
         mobile: `1${pick(['3', '5', '7', '8', '9'])}${String(randInt(100000000, 999999999)).slice(0, 9)}`,
@@ -81,7 +82,7 @@ export const propertyDb = makeList(68, (i) => {
         status: rand() > 0.15 ? 1 : 0,
         expire_start: hasExpire ? ago(randInt(0, 200)).slice(0, 10) : '',
         expire_end: hasExpire ? ago(-randInt(30, 730)).slice(0, 10) : '',
-        community_count: randInt(1, 12),
+        community_count: 1,
         user_count: randInt(200, 8000),
         order_count: randInt(500, 20000),
         total_amount: randInt(100000, 9000000) / 100,
@@ -90,8 +91,8 @@ export const propertyDb = makeList(68, (i) => {
 })
 
 // ---------------------------------------------------------------- 小区
-export const communityDb = makeList(136, (i) => {
-    const p = propertyDb[randInt(0, propertyDb.length - 1)]
+// 一物业一小区：小区与物业一一对应（物业 i 管辖小区 20001+i）
+export const communityDb = propertyDb.map((p, i) => {
     const totalHouse = randInt(200, 3000)
     return {
         id: 20001 + i,
@@ -499,7 +500,7 @@ export const settingDb = {
 // ---------------------------------------------------------------- 统计数据
 const statBase = {
     property: { today: 2, month: 26, total: 68 },
-    community: { today: 5, month: 63, total: 136 },
+    community: { today: 5, month: 63, total: 68 },
     user: { today: 128, month: 3260, total: 128960 },
     order: { today: 486, month: 12480, total: 486320 },
     amount: { today: 58620.5, month: 1586420.8, total: 58620480.6 },

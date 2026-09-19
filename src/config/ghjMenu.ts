@@ -34,14 +34,7 @@ export const GHJ_MENU: GhjMenuItem[] = [
         icon: 'local-icon-guanli',
         is_show: 1,
         children: [
-            { type: 'C', name: '物业列表', paths: 'list', component: 'ghj/property/list', is_show: 1 },
-            {
-                type: 'C',
-                name: '小区列表',
-                paths: 'community',
-                component: 'ghj/property/community',
-                is_show: 1
-            }
+            { type: 'C', name: '物业列表', paths: 'list', component: 'ghj/property/list', is_show: 1 }
         ]
     },
     {

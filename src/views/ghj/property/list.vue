@@ -140,9 +140,10 @@
                     </template>
                 </el-table-column>
                 <el-table-column label="添加时间" prop="create_time" min-width="160" />
-                <el-table-column label="操作" width="160" fixed="right">
+                <el-table-column label="操作" width="240" fixed="right">
                     <template #default="{ row }">
                         <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
+                        <el-button type="success" link @click="handleCommunity(row)">小区信息</el-button>
                         <el-button type="danger" link @click="handleResetPwd(row)">
                             重置密码
                         </el-button>
@@ -153,6 +154,54 @@
                 <pagination v-model="pager" @change="getLists" />
             </div>
         </el-card>
+
+        <!-- 小区信息（一物业一小区，点击查看所属小区详情） -->
+        <popup
+            ref="communityRef"
+            title="小区信息"
+            width="600px"
+            confirm-button-text="关闭"
+            :cancel-button-text="false"
+        >
+            <div class="detail">
+                <div class="detail__item">
+                    <span class="detail__label">小区ID：</span>
+                    <span>{{ communityDetail.id || '-' }}</span>
+                </div>
+                <div class="detail__item">
+                    <span class="detail__label">小区名称：</span>
+                    <span>{{ communityDetail.name || '-' }}</span>
+                </div>
+                <div class="detail__item">
+                    <span class="detail__label">所属物业：</span>
+                    <span>{{ communityDetail.property_name || '-' }}</span>
+                </div>
+                <div class="detail__item">
+                    <span class="detail__label">建成年份：</span>
+                    <span>{{ communityDetail.build_year || '-' }}</span>
+                </div>
+                <div class="detail__item detail__item--full">
+                    <span class="detail__label">详细地址：</span>
+                    <span>{{ getFullAddress(communityDetail) }}</span>
+                </div>
+                <div class="detail__item">
+                    <span class="detail__label">总栋数：</span>
+                    <span>{{ communityDetail.building_count ?? '-' }}</span>
+                </div>
+                <div class="detail__item">
+                    <span class="detail__label">总户数：</span>
+                    <span>{{ communityDetail.house_count ?? '-' }}</span>
+                </div>
+                <div class="detail__item">
+                    <span class="detail__label">已认证户数：</span>
+                    <span>{{ communityDetail.auth_house_count ?? '-' }}</span>
+                </div>
+                <div class="detail__item">
+                    <span class="detail__label">创建时间：</span>
+                    <span>{{ communityDetail.create_time || '-' }}</span>
+                </div>
+            </div>
+        </popup>
     </div>
 </template>
 
@@ -160,6 +209,7 @@
 import type { FormInstance } from 'element-plus'
 
 import {
+    getCommunityDetail,
     getPropertyList,
     propertyAdd,
     propertyEdit,
@@ -326,5 +376,45 @@ onActivated(() => {
     getLists()
 })
 
+// ------------------------------------------------ 小区信息（一物业一小区，点击查看所属小区详情）
+const communityRef = shallowRef<InstanceType<typeof Popup>>()
+const communityDetail = ref<any>({})
+
+// 拼接省市区 + 详细地址
+const getFullAddress = (row: any) => {
+    if (!row) return '-'
+    const arr = [row.province, row.city, row.district, row.address].filter((i) => !!i)
+    return arr.join('') || '-'
+}
+
+const handleCommunity = async (row: any) => {
+    communityDetail.value = {}
+    communityRef.value?.open()
+    if (row.community_id) {
+        communityDetail.value = await getCommunityDetail({ id: row.community_id })
+    }
+}
+
 getLists()
 </script>
+
+<style scoped lang="scss">
+.detail {
+    display: flex;
+    flex-wrap: wrap;
+    line-height: 28px;
+    &__item {
+        width: 50%;
+        padding: 4px 0;
+        font-size: 14px;
+        color: #303133;
+        word-break: break-all;
+        &--full {
+            width: 100%;
+        }
+    }
+    &__label {
+        color: #909399;
+    }
+}
+</style>
