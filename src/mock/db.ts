@@ -10,8 +10,26 @@ const rand = () => {
     seed = (seed * 9301 + 49297) % 233280
     return seed / 233280
 }
-const randInt = (min: number, max: number) => Math.floor(rand() * (max - min + 1)) + min
-const pick = <T>(arr: T[]): T => arr[randInt(0, arr.length - 1)]
+const randInt = (min: number, max: number, r: () => number = rand) =>
+    Math.floor(r() * (max - min + 1)) + min
+const pick = <T>(arr: T[], r: () => number = rand): T => arr[randInt(0, arr.length - 1, r)]
+
+/**
+ * 按 key 生成独立且可复现的随机源
+ * 说明：全局 rand 每次调用都会推进种子，导致详情类数据（订单/结算/手环等）每次打开都不一样。
+ *      这里按 userId 等维度隔离随机源，保证同一对象的数据稳定不变。
+ */
+const makeRand = (key: string | number) => {
+    let s = 9301
+    const str = String(key)
+    for (let i = 0; i < str.length; i++) {
+        s = (s * 31 + str.charCodeAt(i) + 49297) % 233280
+    }
+    return () => {
+        s = (s * 9301 + 49297) % 233280
+        return s / 233280
+    }
+}
 
 const surnames = '王李张刘陈杨黄赵吴周徐孙马朱胡林郭何高罗郑梁谢宋唐许韩冯邓曹彭曾肖田董袁潘蒋蔡余杜叶程苏魏吕丁任沈姚卢姜崔钟谭陆汪范金石廖贾夏韦付方白邹孟熊秦邱江尹薛闫段雷侯龙史陶黎贺顾毛郝龚邵万钱严覃武戴莫孔向汤'.split(
     ''
@@ -115,55 +133,89 @@ export const userDb = makeList(260, (i) => {
     }
 })
 
-// 用户：订单信息
-export const userOrderDb = (userId: number) =>
-    makeList(randInt(3, 10), (i) => ({
-        id: 40001 + i,
-        order_sn: `NO${userId}${String(randInt(100000, 999999))}`,
-        title: pick([
-            '上门陪诊服务',
-            '老人日间托管',
-            '社区营养膳食配送',
-            '健康监测手环绑定',
-            '陪同就医全程服务',
-            '术后康复陪护'
-        ]),
-        type: pick(['托管', '报餐', '陪诊']),
-        amount: randInt(1000, 200000) / 100,
-        create_time: ago(randInt(0, 120)),
-        status: pick(['待服务', '服务中', '已完成', '已取消'])
-    }))
+// 用户：订单信息（按 userId 确定性生成；托管 / 报餐 / 陪诊三类标题与类型联动）
+const ORDER_TYPE_MAP: Record<string, string[]> = {
+    托管: ['老人日间托管', '暑期儿童托管', '术后康复陪护'],
+    报餐: ['社区营养膳食配送', '老年助餐配送', '慢病调理餐配送'],
+    陪诊: ['上门陪诊服务', '陪同就医全程服务', '健康监测手环绑定']
+}
+export const userOrderDb = (userId: number) => {
+    const r = makeRand(`order-${userId}`)
+    return makeList(randInt(3, 10, r), (i) => {
+        const type = pick(['托管', '报餐', '陪诊'], r)
+        return {
+            id: 40001 + i,
+            order_sn: `NO${userId}${String(randInt(100000, 999999, r))}`,
+            title: pick(ORDER_TYPE_MAP[type], r),
+            type,
+            amount: randInt(1000, 200000, r) / 100,
+            create_time: ago(randInt(0, 120, r)),
+            status: pick(['待服务', '服务中', '已完成', '已取消'], r)
+        }
+    })
+}
 
-// 用户：结算信息
-export const userSettleDb = () =>
-    makeList(randInt(2, 8), (i) => ({
-        id: 50001 + i,
-        month: `2026-${pad(randInt(1, 8))}`,
-        amount: randInt(10000, 800000) / 100,
-        status: pick(['待结算', '已结算'])
-    }))
+// 用户：结算信息（按 userId 确定性生成，每月一份结算记录，内含该月结算明细）
+export const userSettleDb = (userId: number) => {
+    const r = makeRand(`settle-${userId}`)
+    return makeList(randInt(3, 6, r), (i) => {
+        const d = makeRand(`settle-detail-${userId}-${i}`)
+        const status = pick(['待结算', '已结算'], r)
+        return {
+            id: 50001 + i,
+            month: `2026-${pad(8 - i)}`,
+            amount: randInt(10000, 800000, r) / 100,
+            status,
+            detail: makeList(randInt(2, 6, d), (j) => ({
+                id: 51001 + j,
+                order_sn: `NO${userId}${String(randInt(100000, 999999, d))}`,
+                title: pick(['老人日间托管', '社区营养膳食配送', '上门陪诊服务'], d),
+                amount: randInt(1000, 80000, d) / 100,
+                create_time: ago(randInt(0, 120, d)),
+                status: pick([status, status, '已结算'], d)
+            }))
+        }
+    })
+}
 
-// 用户：业主认证
-export const userAuthDb = () =>
-    makeList(randInt(1, 4), (i) => ({
+// 用户：业主认证（按 userId 确定性生成）
+export const userAuthDb = (userId: number) => {
+    const r = makeRand(`auth-${userId}`)
+    return makeList(randInt(1, 4, r), (i) => ({
         id: 60001 + i,
-        community_name: pick(communityDb).name,
-        building: `${randInt(1, 30)}栋${randInt(1, 6)}单元${randInt(101, 2808)}`,
-        result: pick(['审核中', '已通过', '已驳回']),
-        create_time: ago(randInt(1, 200))
+        community_name: pick(communityDb, r).name,
+        building: `${randInt(1, 30, r)}栋${randInt(1, 6, r)}单元${randInt(101, 2808, r)}`,
+        result: pick(['审核中', '已通过', '已驳回'], r),
+        create_time: ago(randInt(1, 200, r))
     }))
+}
 
-// 用户：健康手环
-export const userBandDb = () =>
-    makeList(randInt(1, 3), (i) => ({
-        id: 70001 + i,
-        sn: `BAND${randInt(10000000, 99999999)}`,
-        heart_rate: randInt(60, 110),
-        blood_oxygen: randInt(90, 100),
-        step: randInt(1000, 20000),
-        sleep: `${randInt(4, 9)}.${randInt(0, 9)}小时`,
-        bind_time: ago(randInt(1, 300))
-    }))
+// 用户：健康手环（绑定信息 + 健康数据 + 检测数据，按 userId 确定性生成）
+export const userBandDb = (userId: number) => {
+    const r = makeRand(`band-${userId}`)
+    return makeList(1, (i) => {
+        const t = makeRand(`band-test-${userId}`)
+        return {
+            id: 70001 + i,
+            sn: `BAND${randInt(10000000, 99999999, r)}`,
+            bind_time: ago(randInt(1, 300, r)),
+            // 健康数据
+            heart_rate: randInt(60, 110, r),
+            blood_oxygen: randInt(90, 100, r),
+            step: randInt(1000, 20000, r),
+            sleep: `${randInt(4, 9, r)}.${randInt(0, 9, r)}小时`,
+            // 检测数据
+            test_list: makeList(randInt(3, 6, t), (j) => ({
+                id: 71001 + j,
+                name: pick(['血压检测', '血糖检测', '体脂检测', '心电检测', '体温检测'], t),
+                value: `${randInt(60, 180, t)}`,
+                unit: pick(['mmHg', 'mmol/L', '%', 'bpm', '℃'], t),
+                result: pick(['正常', '正常', '偏高', '偏低'], t),
+                test_time: ago(randInt(0, 60, t), randInt(0, 23, t))
+            }))
+        }
+    })
+}
 
 // ---------------------------------------------------------------- 员工
 export const staffDb = makeList(96, (i) => {
@@ -208,30 +260,44 @@ export const hrDb = makeList(72, (i) => {
     }
 })
 
-// 用户：顾好家币明细（按所属物业维度展示余额与变动记录）
-export const userCoinDb = (userId: number) =>
-    makeList(randInt(3, 10), (i) => ({
+// 用户：顾好家币明细（按所属物业维度展示余额与变动记录，余额由明细按时间倒序累计）
+export const userCoinDb = (userId: number) => {
+    const r = makeRand(`coin-${userId}`)
+    const list = makeList(randInt(4, 10, r), (i) => ({
         id: 190001 + i,
-        property_name: pick(communityDb).property_name,
-        change: (rand() > 0.5 ? 1 : -1) * randInt(10, 500),
-        balance: randInt(0, 5000),
-        remark: pick(['订单消费', '服务奖励', '活动赠送', '提现扣除']),
-        create_time: ago(randInt(0, 200))
+        property_name: pick(communityDb, r).property_name,
+        change: (r() > 0.5 ? 1 : -1) * randInt(10, 500, r),
+        balance: 0,
+        remark: pick(['订单消费', '服务奖励', '活动赠送', '提现扣除'], r),
+        create_time: ago(randInt(0, 200, r))
     }))
+    // 列表按时间倒序（最新在前），余额从最新一条往前累计推导
+    list.sort((a, b) => (a.create_time < b.create_time ? 1 : -1))
+    let cursor = randInt(200, 5000, r)
+    list.forEach((item: any) => {
+        item.balance = cursor
+        cursor = Math.max(0, cursor - item.change)
+    })
+    return list
+}
 
-// 用户：人才中心（认证的人才类型 / 资质证件 / 审核状态 / 历史接单）
-export const userTalentDb = () => ({
-    talent_type: pick(['陪诊员', '托管员', '膳食配送员', '康复理疗师', '家政服务员']),
-    credential: RESOURCE_IMGS[randInt(0, RESOURCE_IMGS.length - 1)],
-    audit_status: pick(['审核中', '已通过', '已驳回']),
-    order_history: makeList(randInt(2, 8), (i) => ({
-        id: 200001 + i,
-        title: pick(['上门陪诊服务', '老人日间托管', '社区营养膳食配送', '康复理疗服务']),
-        amount: randInt(1000, 200000) / 100,
-        status: pick(['已完成', '已取消', '服务中']),
-        create_time: ago(randInt(0, 150))
-    }))
-})
+// 用户：人才中心（认证的人才类型 / 资质证件 / 审核状态 / 历史接单，按 userId 确定性生成）
+export const userTalentDb = (userId: number) => {
+    const r = makeRand(`talent-${userId}`)
+    return {
+        talent_type: pick(['陪诊员', '托管员', '膳食配送员', '康复理疗师', '家政服务员'], r),
+        credential: RESOURCE_IMGS[randInt(0, RESOURCE_IMGS.length - 1, r)],
+        audit_status: pick(['审核中', '已通过', '已驳回'], r),
+        audit_time: ago(randInt(0, 60, r)),
+        order_history: makeList(randInt(2, 8, r), (i) => ({
+            id: 200001 + i,
+            title: pick(['上门陪诊服务', '老人日间托管', '社区营养膳食配送', '康复理疗服务'], r),
+            amount: randInt(1000, 200000, r) / 100,
+            status: pick(['已完成', '已取消', '服务中'], r),
+            create_time: ago(randInt(0, 150, r))
+        }))
+    }
+}
 
 // ---------------------------------------------------------------- 内容：人才库（通过认证的人才）
 export const talentDb = makeList(58, (i) => {
@@ -318,14 +384,16 @@ export const activityRecordDb = (activityId: number) =>
         join_time: ago(randInt(0, 60))
     }))
 
-// 用户报名记录
-export const userJoinDb = () =>
-    makeList(randInt(1, 6), (i) => ({
+// 用户报名记录（按 userId 确定性生成）
+export const userJoinDb = (userId: number) => {
+    const r = makeRand(`join-${userId}`)
+    return makeList(randInt(1, 6, r), (i) => ({
         id: 150001 + i,
-        title: pick(activityDb).title,
-        activity_time: ago(-randInt(1, 60)),
-        join_time: ago(randInt(1, 90))
+        title: pick(activityDb, r).title,
+        activity_time: ago(-randInt(1, 60, r)),
+        join_time: ago(randInt(1, 90, r))
     }))
+}
 
 // ---------------------------------------------------------------- 内容：社区通知
 export const noticeDb = makeList(46, (i) => {
@@ -452,18 +520,74 @@ export function delay<T>(data: T, ms = 260): Promise<T> {
     return new Promise((resolve) => setTimeout(() => resolve(data), ms))
 }
 
-/** 分页 + 关键字筛选 */
+/** 导出：每次最多导出的页数 */
+const EXPORT_MAX_PAGE = 200
+/** 分页相关参数（不参与数据筛选） */
+const RESERVED_KEYS = [
+    'page_no',
+    'page_size',
+    'export',
+    'page_type',
+    'page_start',
+    'page_end',
+    'file_name'
+]
+
+/** 浏览器端下载 xlsx（异步加载依赖，不进入首屏包体） */
+async function downloadExcel(rows: any[], columns: Record<string, string>, fileName: string) {
+    try {
+        const XLSX = await import('xlsx')
+        const data = rows.map((row) => {
+            const out: Record<string, any> = {}
+            const keys = columns && Object.keys(columns).length ? Object.keys(columns) : Object.keys(row)
+            keys.forEach((key) => {
+                out[columns?.[key] || key] = row[key]
+            })
+            return out
+        })
+        const sheet = XLSX.utils.json_to_sheet(data.length ? data : [{}])
+        const wb = XLSX.utils.book_new()
+        XLSX.utils.book_append_sheet(wb, sheet, '数据')
+        const buf = XLSX.write(wb, { bookType: 'xlsx', type: 'array' }) as ArrayBuffer
+        const blob = new Blob([buf], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${fileName || '导出数据'}.xlsx`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        setTimeout(() => URL.revokeObjectURL(url), 1000)
+    } catch (error) {
+        console.warn('[mock] 导出 excel 失败', error)
+    }
+}
+
+/** 导出描述：文件默认名 + 列名中文映射 */
+export interface ExportMeta {
+    name?: string
+    columns?: Record<string, string>
+}
+
+/**
+ * 分页 + 关键字筛选 + 导出
+ * params.export = 1 返回导出元信息；params.export = 2 生成 xlsx 下载并返回导出区间数据
+ * meta.columns 用于导出时把字段键映射为中文列名
+ */
 export function paginate<T extends Record<string, any>>(
     source: T[],
     params: Record<string, any> = {},
-    matchers: Record<string, (item: T, value: any) => boolean> = {}
+    matchers: Record<string, (item: T, value: any) => boolean> = {},
+    meta: ExportMeta = {}
 ) {
     const { page_no = 1, page_size = 15 } = params
     let list = [...source]
     Object.keys(params).forEach((key) => {
         const value = params[key]
         if (value === '' || value === undefined || value === null) return
-        if (key === 'page_no' || key === 'page_size' || key === 'export') return
+        if (RESERVED_KEYS.includes(key)) return
         if (matchers[key]) {
             list = list.filter((item) => matchers[key](item, value))
         } else if (typeof value === 'string' || typeof value === 'number') {
@@ -471,8 +595,41 @@ export function paginate<T extends Record<string, any>>(
         }
     })
     const count = list.length
-    const start = (Number(page_no) - 1) * Number(page_size)
-    return { count, lists: list.slice(start, start + Number(page_size)) }
+    const size = Number(page_size)
+    const exportType = Number(params.export || 0)
+    const name = params.file_name || meta.name || '导出数据'
+
+    // 打开导出弹窗：返回统计元信息
+    if (exportType === 1) {
+        const sum_page = Math.max(1, Math.ceil(count / size))
+        return {
+            count,
+            lists: [],
+            sum_page,
+            page_size: size,
+            max_page: EXPORT_MAX_PAGE,
+            all_max_size: EXPORT_MAX_PAGE * size,
+            file_name: name,
+            page_start: 1,
+            page_end: Math.min(sum_page, EXPORT_MAX_PAGE)
+        }
+    }
+    // 确认导出：生成文件下载
+    if (exportType === 2) {
+        let start = 0
+        let end = count
+        if (Number(params.page_type) === 1) {
+            const ps = Math.max(1, Number(params.page_start || 1))
+            const pe = Math.max(ps, Number(params.page_end || ps))
+            start = (ps - 1) * size
+            end = pe * size
+        }
+        const exportRows = list.slice(start, Math.min(end, count))
+        void downloadExcel(exportRows, meta.columns || {}, name)
+        return { count, lists: exportRows }
+    }
+    const start = (Number(page_no) - 1) * size
+    return { count, lists: list.slice(start, start + size) }
 }
 
 /** 时间范围筛选 */
