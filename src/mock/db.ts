@@ -547,20 +547,25 @@ export const boardingDb = makeList(28, (i) => {
 })
 
 // ---------------------------------------------------------------- 运营管理：陪诊服务（物业后台添加，平台仅查看 + 显示/下架）
-export const escortDb = makeList(24, (i) => {
+// 陪诊服务固定 5 项（与用户端一致）
+export const ESCORT_ITEMS: { title: string; brief: string; price: number }[] = [
+    { title: '医院就诊全程陪诊', brief: '含挂号协助、问诊陪同、取药代领、报告解读', price: 199 },
+    { title: '专家号预约陪诊', brief: '三甲专家号预约 · 全程陪同就诊', price: 299 },
+    { title: '体检全程陪检', brief: '体检项目引导、排队取号、报告代取', price: 169 },
+    { title: '夜间急诊陪诊', brief: '夜间及节假日急诊陪同就医', price: 259 },
+    { title: '代取药送药上门', brief: '处方代取 · 药品配送到家', price: 59 }
+]
+
+export const escortDb = makeList(20, (i) => {
+    const item = ESCORT_ITEMS[i % ESCORT_ITEMS.length]
     const c = pick(communityDb)
-    const desc = pick([
-        '含院内全程陪诊、挂号取药与报告代取',
-        '提供就诊规划、陪同检查与用药提醒',
-        '适配长者及行动不便人群的专车接送陪诊'
-    ])
     return {
         id: 220001 + i,
         image: SERVICE_IMGS[i % SERVICE_IMGS.length],
-        title: pick(['上门陪诊服务', '陪同就医全程服务', '健康监测手环绑定']),
+        title: item.title,
         property_name: c.property_name,
-        price: randInt(50, 380),
-        content: `<p>本陪诊服务由属地物业${c.property_name}合作的持证陪诊员提供，覆盖${desc}。</p><p>服务流程：提前预约—资料核对—全程陪同—就诊小结反馈，确保就诊过程安全、顺畅、有人照应。</p><p>面向独居老人、孕产期女性、异地就医居民等需要协助的人群，可灵活选择半日或全天陪诊。</p>`,
+        price: item.price,
+        content: `<p>${item.brief}。</p><p>本服务由属地物业${c.property_name}合作的持证陪诊员提供：提前预约—资料核对—全程陪同—就诊小结反馈，确保就诊过程安全、顺畅、有人照应。</p><p>面向独居老人、孕产期女性、异地就医居民等需要协助的人群，下单后陪诊员将按约定时间上门或院内汇合。</p>`,
         status: pick(['显示中', '已下架']),
         sort: randInt(0, 100),
         create_time: ago(randInt(0, 120), randInt(0, 23))
