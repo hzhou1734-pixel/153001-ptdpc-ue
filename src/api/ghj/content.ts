@@ -146,6 +146,13 @@ export function getNoticeDetail(params: { id: any }) {
     return delay(noticeDb.find((i) => String(i.id) === String(params.id)) || {})
 }
 
+// 通知状态开关：显示 / 下架，写入 noticeDb
+export function noticeStatus(params: { id: any; status: string }) {
+    const item = noticeDb.find((i) => String(i.id) === String(params.id))
+    if (item) item.status = params.status
+    return delay({}, 200)
+}
+
 // ---------------------------------------------------------------- 精彩内容
 export function getWonderfulList(params: Record<string, any>) {
     const list = paginate(wonderfulDb, params, {
