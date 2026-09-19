@@ -1,7 +1,10 @@
 import {
     activityDb,
     activityRecordDb,
+    boardingDb,
     delay,
+    escortDb,
+    helperDb,
     hrDb,
     inRange,
     nextId,
@@ -172,6 +175,55 @@ export function getWonderfulDetail(params: { id: any }) {
 // 精彩内容状态开关：显示 / 下架，写入 wonderfulDb
 export function wonderfulStatus(params: { id: any; status: string }) {
     const item = wonderfulDb.find((i) => String(i.id) === String(params.id))
+    if (item) item.status = params.status
+    return delay({}, 200)
+}
+
+// ---------------------------------------------------------------- 运营管理：托管服务
+export function getBoardingList(params: Record<string, any>) {
+    const list = paginate(boardingDb, params, {
+        title: (item, v) => item.title.includes(v),
+        type: (item, v) => item.type === v,
+        status: (item, v) => item.status === v,
+        start_time: (item, v) => inRange(item.create_time, v, params.end_time)
+    })
+    return delay(list)
+}
+
+export function boardingStatus(params: { id: any; status: string }) {
+    const item = boardingDb.find((i) => String(i.id) === String(params.id))
+    if (item) item.status = params.status
+    return delay({}, 200)
+}
+
+// ---------------------------------------------------------------- 运营管理：陪诊服务
+export function getEscortList(params: Record<string, any>) {
+    const list = paginate(escortDb, params, {
+        title: (item, v) => item.title.includes(v),
+        status: (item, v) => item.status === v,
+        start_time: (item, v) => inRange(item.create_time, v, params.end_time)
+    })
+    return delay(list)
+}
+
+export function escortStatus(params: { id: any; status: string }) {
+    const item = escortDb.find((i) => String(i.id) === String(params.id))
+    if (item) item.status = params.status
+    return delay({}, 200)
+}
+
+// ---------------------------------------------------------------- 运营管理：生活帮手
+export function getHelperList(params: Record<string, any>) {
+    const list = paginate(helperDb, params, {
+        title: (item, v) => item.title.includes(v),
+        status: (item, v) => item.status === v,
+        start_time: (item, v) => inRange(item.create_time, v, params.end_time)
+    })
+    return delay(list)
+}
+
+export function helperStatus(params: { id: any; status: string }) {
+    const item = helperDb.find((i) => String(i.id) === String(params.id))
     if (item) item.status = params.status
     return delay({}, 200)
 }

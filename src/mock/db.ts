@@ -520,6 +520,52 @@ export const wonderfulDb = makeList(34, (i) => {
     }
 })
 
+// 服务封面图（复用 post 系列 SVG）
+const SERVICE_IMGS = makeList(7, (i) => `${import.meta.env.BASE_URL}mock-img/post/${i}.svg`)
+
+// ---------------------------------------------------------------- 运营管理：托管服务（物业后台添加，平台仅查看 + 显示/下架）
+export const boardingDb = makeList(28, (i) => {
+    const type = pick(['老人日间托管', '暑期儿童托管', '术后康复陪护'])
+    return {
+        id: 210001 + i,
+        title: `${pick(['安心', '暖心', '贴心', '专业'])}${type}`,
+        type,
+        half_price: randInt(30, 120),
+        full_price: randInt(80, 260),
+        status: pick(['显示中', '已下架']),
+        sort: randInt(0, 100),
+        create_time: ago(randInt(0, 120), randInt(0, 23))
+    }
+})
+
+// ---------------------------------------------------------------- 运营管理：陪诊服务（物业后台添加，平台仅查看 + 显示/下架）
+export const escortDb = makeList(24, (i) => {
+    const title = pick(['上门陪诊服务', '陪同就医全程服务', '健康监测手环绑定'])
+    return {
+        id: 220001 + i,
+        title,
+        price: randInt(50, 380),
+        status: pick(['显示中', '已下架']),
+        sort: randInt(0, 100),
+        create_time: ago(randInt(0, 120), randInt(0, 23))
+    }
+})
+
+// ---------------------------------------------------------------- 运营管理：生活帮手（物业后台添加，平台仅查看 + 显示/隐藏）
+export const helperDb = makeList(30, (i) => {
+    const title = pick(['家政保洁收纳', '家电维修安装', '代买代办跑腿'])
+    return {
+        id: 230001 + i,
+        image: SERVICE_IMGS[i % SERVICE_IMGS.length],
+        title,
+        price: randInt(20, 320),
+        sales: randInt(0, 5000),
+        status: pick(['显示', '隐藏']),
+        sort: randInt(0, 100),
+        create_time: ago(randInt(0, 120), randInt(0, 23))
+    }
+})
+
 // ---------------------------------------------------------------- 系统：角色 / 管理员
 export const roleDb = [
     { id: 1, name: '超级管理员', desc: '拥有平台端全部功能权限', create_time: ago(400) },

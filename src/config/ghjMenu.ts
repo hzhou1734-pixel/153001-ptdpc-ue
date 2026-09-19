@@ -35,7 +35,10 @@ export const GHJ_MENU: GhjMenuItem[] = [
         is_show: 1,
         children: [
             { type: 'C', name: '物业列表', paths: 'list', component: 'ghj/property/list', is_show: 1 },
-            { type: 'C', name: '小区详情', paths: 'communityDetail', component: 'ghj/property/communityDetail', is_show: 0 }
+            { type: 'C', name: '小区详情', paths: 'communityDetail', component: 'ghj/property/communityDetail', is_show: 0 },
+            { type: 'C', name: '托管服务', paths: 'boarding', component: 'ghj/service/boarding', is_show: 1 },
+            { type: 'C', name: '陪诊服务', paths: 'escort', component: 'ghj/service/escort', is_show: 1 },
+            { type: 'C', name: '生活帮手', paths: 'helper', component: 'ghj/service/helper', is_show: 1 }
         ]
     },
     {

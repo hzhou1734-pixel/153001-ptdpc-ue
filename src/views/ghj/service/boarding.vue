@@ -1,0 +1,195 @@
+<!-- 运营管理：托管服务（物业后台添加，平台仅查看 + 显示/下架） -->
+<template>
+    <div>
+        <el-card class="!border-none" shadow="never">
+            <el-form class="mb-[-16px]" :model="queryParams" :inline="true">
+                <el-form-item class="w-[280px]" label="服务标题">
+                    <el-input
+                        v-model="queryParams.title"
+                        placeholder="请输入托管服务标题"
+                        clearable
+                        @keyup.enter="resetPage"
+                    />
+                </el-form-item>
+                <el-form-item class="w-[200px]" label="托管类型">
+                    <el-select v-model="queryParams.type" placeholder="全部" clearable>
+                        <el-option
+                            v-for="item in typeOptions"
+                            :key="item"
+                            :label="item"
+                            :value="item"
+                        />
+                    </el-select>
+                </el-form-item>
+                <el-form-item class="w-[200px]" label="托管状态">
+                    <el-select v-model="queryParams.status" placeholder="全部" clearable>
+                        <el-option
+                            v-for="item in statusOptions"
+                            :key="item"
+                            :label="item"
+                            :value="item"
+                        />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="添加时间">
+                    <daterange-picker
+                        v-model:startTime="queryParams.start_time"
+                        v-model:endTime="queryParams.end_time"
+                    />
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="resetPage">查询</el-button>
+                    <el-button @click="resetParams">重置</el-button>
+                    <export-data
+                        class="ml-2.5"
+                        :fetch-fun="getBoardingList"
+                        :params="queryParams"
+                        :page-size="pager.size"
+                    />
+                </el-form-item>
+            </el-form>
+        </el-card>
+        <el-card class="!border-none mt-4" shadow="never">
+            <el-table size="large" v-loading="pager.loading" :data="pager.lists">
+                <el-table-column label="托管服务标题" prop="title" min-width="240" show-overflow-tooltip />
+                <el-table-column label="半天价格" min-width="120">
+                    <template #default="{ row }">¥{{ row.half_price }}</template>
+                </el-table-column>
+                <el-table-column label="整天价格" min-width="120">
+                    <template #default="{ row }">¥{{ row.full_price }}</template>
+                </el-table-column>
+                <el-table-column label="状态" min-width="130">
+                    <template #default="{ row }">
+                        <el-switch
+                            v-model="row.status"
+                            inline-prompt
+                            active-value="显示中"
+                            inactive-value="已下架"
+                            active-text="显示"
+                            inactive-text="下架"
+                            @change="(val) => handleStatus(row, String(val))"
+                        />
+                    </template>
+                </el-table-column>
+                <el-table-column label="排序" prop="sort" min-width="90" />
+                <el-table-column label="添加时间" prop="create_time" min-width="170" />
+                <el-table-column label="操作" width="120" fixed="right">
+                    <template #default="{ row }">
+                        <el-button type="primary" link @click="handleDetail(row)">查看</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="flex justify-end mt-4">
+                <pagination v-model="pager" @change="getLists" />
+            </div>
+        </el-card>
+
+        <!-- 服务详情 -->
+        <popup
+            ref="detailRef"
+            title="托管服务详情"
+            width="640px"
+            confirm-button-text="关闭"
+            :cancel-button-text="false"
+        >
+            <div class="detail" v-if="detail.id">
+                <div class="detail__item detail__item--full">
+                    <span class="detail__label">服务标题：</span>
+                    <span>{{ detail.title || '-' }}</span>
+                </div>
+                <div class="detail__item">
+                    <span class="detail__label">托管类型：</span>
+                    <span>{{ detail.type || '-' }}</span>
+                </div>
+                <div class="detail__item">
+                    <span class="detail__label">状态：</span>
+                    <span>{{ detail.status || '-' }}</span>
+                </div>
+                <div class="detail__item">
+                    <span class="detail__label">半天价格：</span>
+                    <span>¥{{ detail.half_price ?? '-' }}</span>
+                </div>
+                <div class="detail__item">
+                    <span class="detail__label">整天价格：</span>
+                    <span>¥{{ detail.full_price ?? '-' }}</span>
+                </div>
+                <div class="detail__item">
+                    <span class="detail__label">排序：</span>
+                    <span>{{ detail.sort ?? '-' }}</span>
+                </div>
+                <div class="detail__item detail__item--full">
+                    <span class="detail__label">添加时间：</span>
+                    <span>{{ detail.create_time || '-' }}</span>
+                </div>
+            </div>
+        </popup>
+    </div>
+</template>
+
+<script lang="ts" setup name="ghjServiceBoarding">
+import { boardingStatus, getBoardingList } from '@/api/ghj/content'
+import Popup from '@/components/popup/index.vue'
+import { ElMessage } from 'element-plus'
+
+import { usePaging } from '@/hooks/usePaging'
+
+const queryParams = reactive({
+    title: '',
+    type: '',
+    status: '',
+    start_time: '',
+    end_time: ''
+})
+
+const { pager, getLists, resetPage, resetParams } = usePaging({
+    fetchFun: getBoardingList,
+    params: queryParams
+})
+
+// 托管类型 / 状态下拉
+const typeOptions = ['老人日间托管', '暑期儿童托管', '术后康复陪护']
+const statusOptions = ['显示中', '已下架']
+
+// ------------------------------------------------ 服务详情
+const detailRef = shallowRef<InstanceType<typeof Popup>>()
+const detail = ref<any>({})
+
+const handleDetail = async (row: any) => {
+    detail.value = {}
+    detailRef.value?.open()
+    detail.value = { ...row }
+}
+
+// 状态开关：显示 / 下架
+const handleStatus = async (row: any, status: string) => {
+    await boardingStatus({ id: row.id, status })
+    ElMessage.success(status === '显示中' ? '托管服务已显示' : '托管服务已下架')
+}
+
+onActivated(() => {
+    getLists()
+})
+
+getLists()
+</script>
+
+<style scoped lang="scss">
+.detail {
+    display: flex;
+    flex-wrap: wrap;
+    line-height: 28px;
+    &__item {
+        width: 50%;
+        padding: 4px 0;
+        font-size: 14px;
+        color: #303133;
+        word-break: break-all;
+        &--full {
+            width: 100%;
+        }
+    }
+    &__label {
+        color: #909399;
+    }
+}
+</style>
