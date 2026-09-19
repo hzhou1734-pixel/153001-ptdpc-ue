@@ -106,19 +106,19 @@
         <popup
             ref="recordRef"
             title="报名记录"
-            width="800px"
+            width="1000px"
             confirm-button-text="关闭"
             :cancel-button-text="false"
         >
             <el-table size="large" :data="records">
-                <el-table-column label="报名人头像" width="100">
+                <el-table-column label="报名人头像" width="130">
                     <template #default="{ row }">
                         <el-avatar :src="row.avatar" :size="50" />
                     </template>
                 </el-table-column>
-                <el-table-column label="报名人昵称" prop="nickname" min-width="140" />
-                <el-table-column label="手机号码" prop="mobile" min-width="140" />
-                <el-table-column label="提交报名时间" prop="join_time" min-width="170" />
+                <el-table-column label="报名人昵称" prop="nickname" min-width="200" />
+                <el-table-column label="手机号码" prop="mobile" min-width="200" />
+                <el-table-column label="提交报名时间" prop="join_time" min-width="200" />
             </el-table>
         </popup>
     </div>
