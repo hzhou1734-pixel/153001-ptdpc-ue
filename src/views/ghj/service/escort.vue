@@ -11,6 +11,16 @@
                         @keyup.enter="resetPage"
                     />
                 </el-form-item>
+                <el-form-item class="w-[200px]" label="状态">
+                    <el-select v-model="queryParams.status" placeholder="请选择" clearable>
+                        <el-option
+                            v-for="item in statusOptions"
+                            :key="item"
+                            :label="item"
+                            :value="item"
+                        />
+                    </el-select>
+                </el-form-item>
                 <el-form-item class="w-[220px]" label="物业公司">
                     <el-select
                         v-model="queryParams.property_name"
@@ -23,16 +33,6 @@
                             :key="item.id"
                             :label="item.name"
                             :value="item.name"
-                        />
-                    </el-select>
-                </el-form-item>
-                <el-form-item class="w-[200px]" label="状态">
-                    <el-select v-model="queryParams.status" placeholder="全部" clearable>
-                        <el-option
-                            v-for="item in statusOptions"
-                            :key="item"
-                            :label="item"
-                            :value="item"
                         />
                     </el-select>
                 </el-form-item>
@@ -56,15 +56,24 @@
         </el-card>
         <el-card class="!border-none mt-4" shadow="never">
             <el-table size="large" v-loading="pager.loading" :data="pager.lists">
-                <el-table-column label="封面图" width="100">
+                <el-table-column label="陪诊服务标题" min-width="240">
                     <template #default="{ row }">
-                        <image-contain :src="row.image" :width="60" :height="60" fit="cover" />
+                        <div class="title-cell">
+                            <div class="title-cell__name">{{ row.title }}</div>
+                            <div class="title-cell__sub">{{ row.subtitle }}</div>
+                        </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="陪诊服务标题" prop="title" min-width="240" show-overflow-tooltip />
                 <el-table-column label="所属物业" prop="property_name" min-width="180" show-overflow-tooltip />
-                <el-table-column label="价格" min-width="120">
-                    <template #default="{ row }">¥{{ row.price }}</template>
+                <el-table-column label="半天价格" min-width="110">
+                    <template #default="{ row }">
+                        <span class="price-line">{{ row.half_price != null ? '¥' + fmt(row.half_price) : '—' }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="整天价格" min-width="110">
+                    <template #default="{ row }">
+                        <span class="price-line">{{ row.full_price != null ? '¥' + fmt(row.full_price) : '—' }}</span>
+                    </template>
                 </el-table-column>
                 <el-table-column label="状态" min-width="130">
                     <template #default="{ row }">
@@ -79,7 +88,7 @@
                         />
                     </template>
                 </el-table-column>
-                <el-table-column label="排序" prop="sort" min-width="90" />
+                <el-table-column label="推荐" prop="recommend" min-width="90" />
                 <el-table-column label="添加时间" prop="create_time" min-width="170" />
                 <el-table-column label="操作" width="120" fixed="right">
                     <template #default="{ row }">
@@ -102,10 +111,6 @@
         >
             <div class="detail" v-if="detail.id">
                 <div class="detail__item detail__item--full">
-                    <span class="detail__label">封面图：</span>
-                    <image-contain :src="detail.image" :width="120" :height="120" fit="cover" />
-                </div>
-                <div class="detail__item detail__item--full">
                     <span class="detail__label">服务标题：</span>
                     <span>{{ detail.title || '-' }}</span>
                 </div>
@@ -114,16 +119,20 @@
                     <span>{{ detail.property_name || '-' }}</span>
                 </div>
                 <div class="detail__item">
-                    <span class="detail__label">价格：</span>
-                    <span>¥{{ detail.price ?? '-' }}</span>
+                    <span class="detail__label">半天价格：</span>
+                    <span class="price-line">{{ detail.half_price != null ? '¥' + fmt(detail.half_price) : '—' }}</span>
+                </div>
+                <div class="detail__item">
+                    <span class="detail__label">整天价格：</span>
+                    <span class="price-line">{{ detail.full_price != null ? '¥' + fmt(detail.full_price) : '—' }}</span>
                 </div>
                 <div class="detail__item">
                     <span class="detail__label">状态：</span>
                     <span>{{ detail.status || '-' }}</span>
                 </div>
                 <div class="detail__item">
-                    <span class="detail__label">排序：</span>
-                    <span>{{ detail.sort ?? '-' }}</span>
+                    <span class="detail__label">推荐：</span>
+                    <span>{{ detail.recommend ?? '-' }}</span>
                 </div>
                 <div class="detail__item detail__item--full">
                     <span class="detail__label">添加时间：</span>
@@ -162,6 +171,10 @@ const { pager, getLists, resetPage, resetParams } = usePaging({
 // 物业公司 / 状态下拉
 const propertyOptions = ref<any[]>([])
 const statusOptions = ['显示中', '已下架']
+
+// 价格格式化：两位小数
+const fmt = (v?: number | string) =>
+    v === undefined || v === null || v === '' ? '-' : Number(v).toFixed(2)
 
 // ------------------------------------------------ 服务详情
 const detailRef = shallowRef<InstanceType<typeof Popup>>()
@@ -215,6 +228,23 @@ getPropertyOptions().then((res: any) => {
         :deep(p) {
             margin: 0 0 6px;
         }
+    }
+}
+.price-line {
+    color: #ff7a1a;
+    font-size: 13px;
+}
+.title-cell {
+    &__name {
+        font-size: 14px;
+        color: #303133;
+        line-height: 20px;
+    }
+    &__sub {
+        margin-top: 2px;
+        font-size: 12px;
+        color: #909399;
+        line-height: 18px;
     }
 }
 </style>

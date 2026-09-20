@@ -555,28 +555,37 @@ export const boardingDb = makeList(BOARDING_ITEMS.length, (i) => {
 })
 
 // ---------------------------------------------------------------- 运营管理：陪诊服务（物业后台添加，平台仅查看 + 显示/下架）
-// 陪诊服务固定 5 项（与用户端一致）
-export const ESCORT_ITEMS: { title: string; brief: string; price: number }[] = [
-    { title: '医院就诊全程陪诊', brief: '含挂号协助、问诊陪同、取药代领、报告解读', price: 199 },
-    { title: '专家号预约陪诊', brief: '三甲专家号预约 · 全程陪同就诊', price: 299 },
-    { title: '体检全程陪检', brief: '体检项目引导、排队取号、报告代取', price: 169 },
-    { title: '夜间急诊陪诊', brief: '夜间及节假日急诊陪同就医', price: 259 },
-    { title: '代取药送药上门', brief: '处方代取 · 药品配送到家', price: 59 }
+// 陪诊服务固定 6 项（与设计稿一致），价格为半天/整天两档，null 表示不提供该档位
+export const ESCORT_ITEMS: {
+    title: string
+    subtitle: string
+    half_price: number | null
+    full_price: number | null
+    status: string
+    recommend: number
+    create_time: string
+}[] = [
+    { title: '标准陪诊服务', subtitle: '全程陪同 · 代取报告', half_price: 128, full_price: 220, status: '显示中', recommend: 1, create_time: '2026-09-20 09:30:12' },
+    { title: '专家门诊陪诊', subtitle: '三甲挂号加急 · 优待安排', half_price: 198, full_price: null, status: '显示中', recommend: 2, create_time: '2026-09-24 15:12:40' },
+    { title: '老人专属陪诊', subtitle: '健康同步 · 全程贴心照护', half_price: null, full_price: 268, status: '显示中', recommend: 3, create_time: '2026-09-29 10:48:33' },
+    { title: '孕产检查陪诊', subtitle: '产检全程陪同 · 候检协助', half_price: 168, full_price: 300, status: '显示中', recommend: 4, create_time: '2026-09-02 14:20:08' },
+    { title: '住院陪护陪诊', subtitle: '入院办理 · 检查陪护', half_price: 158, full_price: 288, status: '已下架', recommend: 5, create_time: '2026-09-06 16:35:57' },
+    { title: '夜间急诊陪诊', subtitle: '24小时急速响应', half_price: 228, full_price: 388, status: '已下架', recommend: 6, create_time: '2026-09-11 20:14:26' }
 ]
 
-export const escortDb = makeList(20, (i) => {
-    const item = ESCORT_ITEMS[i % ESCORT_ITEMS.length]
+export const escortDb = ESCORT_ITEMS.map((item, i) => {
     const c = pick(communityDb)
     return {
         id: 220001 + i,
-        image: SERVICE_IMGS[i % SERVICE_IMGS.length],
         title: item.title,
+        subtitle: item.subtitle,
         property_name: c.property_name,
-        price: item.price,
-        content: `<p>${item.brief}。</p><p>本服务由属地物业${c.property_name}合作的持证陪诊员提供：提前预约—资料核对—全程陪同—就诊小结反馈，确保就诊过程安全、顺畅、有人照应。</p><p>面向独居老人、孕产期女性、异地就医居民等需要协助的人群，下单后陪诊员将按约定时间上门或院内汇合。</p>`,
-        status: pick(['显示中', '已下架']),
-        sort: randInt(0, 100),
-        create_time: ago(randInt(0, 120), randInt(0, 23))
+        half_price: item.half_price,
+        full_price: item.full_price,
+        status: item.status,
+        recommend: item.recommend,
+        content: `<p>${item.subtitle}。本服务由属地物业${c.property_name}合作的持证陪诊员提供：提前预约—资料核对—全程陪同—就诊小结反馈，确保就诊过程安全、顺畅、有人照应。</p><p>面向独居老人、孕产期女性、异地就医居民等需要协助的人群，下单后陪诊员将按约定时间上门或院内汇合。</p>`,
+        create_time: item.create_time
     }
 })
 
