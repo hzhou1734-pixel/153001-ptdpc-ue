@@ -56,15 +56,16 @@
         </el-card>
         <el-card class="!border-none mt-4" shadow="never">
             <el-table size="large" v-loading="pager.loading" :data="pager.lists">
-                <el-table-column label="托管服务标题" prop="title" min-width="240" show-overflow-tooltip />
-                <el-table-column label="所属物业" prop="property_name" min-width="180" show-overflow-tooltip />
-                <el-table-column label="半天价格" min-width="120">
-                    <template #default="{ row }">¥{{ row.half_price }}</template>
+                <el-table-column label="托管服务标题" prop="title" min-width="200" show-overflow-tooltip />
+                <el-table-column label="所属物业" prop="property_name" min-width="170" show-overflow-tooltip />
+                <el-table-column label="单价（接 / 送 / 用餐 / 托管）" min-width="300">
+                    <template #default="{ row }">
+                        <span class="price-line">
+                            接 ¥{{ fmt(row.pickup_price) }} · 送 ¥{{ fmt(row.drop_price) }} · 用餐 ¥{{ fmt(row.meal_price) }} · 托管 ¥{{ fmt(row.care_price) }}
+                        </span>
+                    </template>
                 </el-table-column>
-                <el-table-column label="整天价格" min-width="120">
-                    <template #default="{ row }">¥{{ row.full_price }}</template>
-                </el-table-column>
-                <el-table-column label="状态" min-width="130">
+                <el-table-column label="状态" min-width="100">
                     <template #default="{ row }">
                         <el-switch
                             v-model="row.status"
@@ -111,13 +112,11 @@
                     <span class="detail__label">状态：</span>
                     <span>{{ detail.status || '-' }}</span>
                 </div>
-                <div class="detail__item">
-                    <span class="detail__label">半天价格：</span>
-                    <span>¥{{ detail.half_price ?? '-' }}</span>
-                </div>
-                <div class="detail__item">
-                    <span class="detail__label">整天价格：</span>
-                    <span>¥{{ detail.full_price ?? '-' }}</span>
+                <div class="detail__item detail__item--full">
+                    <span class="detail__label">单价（接 / 送 / 用餐 / 托管）：</span>
+                    <span class="price-line">
+                        接 ¥{{ fmt(detail.pickup_price) }} · 送 ¥{{ fmt(detail.drop_price) }} · 用餐 ¥{{ fmt(detail.meal_price) }} · 托管 ¥{{ fmt(detail.care_price) }}
+                    </span>
                 </div>
                 <div class="detail__item">
                     <span class="detail__label">排序：</span>
@@ -171,6 +170,10 @@ const handleDetail = async (row: any) => {
     detail.value = { ...row }
 }
 
+// 单价格式：两位小数，缺失显示 -
+const fmt = (v?: number | string) =>
+    v === undefined || v === null || v === '' ? '-' : Number(v).toFixed(2)
+
 // 状态开关：显示 / 下架
 const handleStatus = async (row: any, status: string) => {
     await boardingStatus({ id: row.id, status })
@@ -214,5 +217,9 @@ getPropertyOptions().then((res: any) => {
             margin: 0 0 6px;
         }
     }
+}
+.price-line {
+    color: #ff7a1a;
+    font-size: 13px;
 }
 </style>

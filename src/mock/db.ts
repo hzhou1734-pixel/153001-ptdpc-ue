@@ -524,25 +524,33 @@ export const wonderfulDb = makeList(34, (i) => {
 const SERVICE_IMGS = makeList(7, (i) => `${import.meta.env.BASE_URL}mock-img/post/${i}.svg`)
 
 // ---------------------------------------------------------------- 运营管理：托管服务（物业后台添加，平台仅查看 + 显示/下架）
-export const boardingDb = makeList(28, (i) => {
+// 托管服务固定 8 项（与用户端/物业端一致，单价=接/送/用餐/托管）
+export const BOARDING_ITEMS: { title: string; prices: [number, number, number, number] }[] = [
+    { title: '幼儿全日托（1.5-3岁）', prices: [15, 15, 25, 133] },
+    { title: '小学生放日日托', prices: [10, 10, 18, 90] },
+    { title: '幼儿半日托（上午班）', prices: [15, 15, 20, 108] },
+    { title: '学期每日托管标准班', prices: [8, 8, 15, 96] },
+    { title: '学期每日托·晚托班', prices: [8, 8, 15, 110] },
+    { title: '学期周末托·兴趣班', prices: [12, 12, 20, 84] },
+    { title: '学期周末托·研学班', prices: [20, 20, 25, 163] },
+    { title: '暑期临时日托', prices: [10, 10, 18, 72] }
+]
+
+export const boardingDb = makeList(BOARDING_ITEMS.length, (i) => {
     const c = pick(communityDb)
-    const scene = pick(['老人日间托管', '暑期儿童托管', '术后康复陪护', '长者全托照护'])
-    const priceDesc = pick([
-        '含营养膳食、午休看护与休闲活动',
-        '提供全天候生活照料与健康管理',
-        '专业护工一对一陪伴，安全无忧',
-        '配备适老化设施与应急医护响应'
-    ])
+    const item = BOARDING_ITEMS[i]
     return {
         id: 210001 + i,
-        title: `${pick(['安心', '暖心', '贴心', '专业'])}${scene}`,
+        title: item.title,
         property_name: c.property_name,
-        half_price: randInt(30, 120),
-        full_price: randInt(80, 260),
-        status: pick(['显示中', '已下架']),
-        sort: randInt(0, 100),
+        pickup_price: item.prices[0],
+        drop_price: item.prices[1],
+        meal_price: item.prices[2],
+        care_price: item.prices[3],
+        status: i < 6 ? '显示中' : '已下架',
+        sort: i + 1,
         create_time: ago(randInt(0, 120), randInt(0, 23)),
-        content: `<p>本托管服务面向社区${scene}，由属地物业${c.property_name}统一招募并管理的专业照护团队提供。</p><p>服务内容：${priceDesc}，并按需提供健康建档、用药提醒、紧急联络等增值项目。</p><p>适用人群广泛，既可满足双职工家庭的日间看护需求，也能为术后或年长居民提供有温度的陪伴式照护。</p>`
+        content: `<p>本托管服务「${item.title}」由属地物业${c.property_name}统一招募并管理的专业照护团队提供，单价构成清晰：接（早间接送）¥${item.prices[0]}、送（午间/晚间接送）¥${item.prices[1]}、用餐¥${item.prices[2]}、托管¥${item.prices[3]}，可按需组合。</p><p>服务内容：含营养膳食、午休看护与休闲活动，并按需提供健康建档、用药提醒、紧急联络等增值项目。</p><p>适用人群广泛，既可满足双职工家庭的日间看护需求，也能为年长居民提供有温度的陪伴式照护。</p>`
     }
 })
 
