@@ -111,6 +111,12 @@
                         </div>
                     </template>
                 </el-table-column>
+                <el-table-column
+                    label="所属小区"
+                    prop="community_name"
+                    min-width="160"
+                    show-overflow-tooltip
+                />
                 <el-table-column label="提交时间" prop="submit_time" min-width="170" />
                 <el-table-column label="审核状态" min-width="100">
                     <template #default="{ row }">
@@ -163,7 +169,7 @@
                             <span>{{ detail.mobile || '-' }}</span>
                         </div>
                         <div class="hr-detail__item">
-                            <span class="hr-detail__label">所属社区</span>
+                            <span class="hr-detail__label">所属小区</span>
                             <span>{{ detail.community_name || '-' }}</span>
                         </div>
                         <div class="hr-detail__item">

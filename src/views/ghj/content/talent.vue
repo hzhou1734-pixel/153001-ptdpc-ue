@@ -73,6 +73,12 @@
                 </el-table-column>
                 <el-table-column label="手机号码" prop="mobile" min-width="130" />
                 <el-table-column
+                    label="所属小区"
+                    prop="community_name"
+                    min-width="160"
+                    show-overflow-tooltip
+                />
+                <el-table-column
                     label="认证技能"
                     prop="skill"
                     min-width="150"
@@ -132,6 +138,10 @@
                         <div class="detail__item">
                             <span class="detail__label">手机号码：</span>
                             <span>{{ detail.mobile || '-' }}</span>
+                        </div>
+                        <div class="detail__item">
+                            <span class="detail__label">所属小区：</span>
+                            <span>{{ detail.community_name || '-' }}</span>
                         </div>
                         <div class="detail__item">
                             <span class="detail__label">认证技能：</span>
