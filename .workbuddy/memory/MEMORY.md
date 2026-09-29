@@ -2,8 +2,9 @@
 
 ## 分支与推送策略（2026-09-19 起生效）
 - 需求文档对照整改统一在分支 `feature/req-align` 开发，**不再推送 main 主分支**。
-- 已配置 `.git/hooks/post-commit`：在非 main 分支提交后自动 `git push origin <当前分支>`；main 分支永不自动推送（保护 main，仅通过 PR/合并合入）。
-- hook 用 `~/.ghj_publish_token` 内联 PAT 推送，推送失败仅警告不阻塞 commit。
+- 已配置 `.git/hooks/post-commit`：在非 main 分支提交后自动调用 `.git/hooks/push_branch.mjs`（node）按 commit SHA 推送当前分支（带 12 次重试）；main 分支永不自动推送（保护 main，仅通过 PR/合并合入）。推送失败仅记录到 `.git/push.log` 不阻塞 commit，下次提交会自动重试。
+- **版本号自动递增**：`.git/hooks/pre-commit` 在每个提交前自增 `package.json` 的 patch 版本号（如 1.0.35 → 1.0.36），提交信息用 `vX.Y.Z: <说明>` 与之对应。当前基线 1.0.36（feature/req-align@47da5c3）。
+- hook 用 `~/.ghj_publish_token` 内联 PAT 推送；推送姿势见「Git 环境注意」。
 - 切回 main 工作前需手动 `git checkout main`；合并用 PR 或 `git merge feature/req-align`。
 
 ## 本地预览
